@@ -1,0 +1,1954 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Off-canvas menu demo - 3 kolommen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      :root {
+        color-scheme: light;
+        --sp-bg: #ffffff;
+        --sp-surface: #f6f6f8;
+        --sp-text: #1b1b1f;
+        --sp-muted: #6b6b74;
+        --sp-border: #f1f1f1;
+        --sp-accent: #D07444;
+        --sp-accent-hover: #ac5a2e;
+        --sp-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+      }
+
+      * {
+        box-sizing: border-box;
+        font-size: 14px;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--sp-bg);
+        font-weight: 400;
+        color: var(--sp-text);
+      }
+
+      html.sp-menu-open,
+      body.sp-menu-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+      }
+
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--sp-bg);
+        border-bottom: 1px solid var(--sp-border);
+      }
+
+      .navbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1520px;
+        margin: 0 auto;
+        gap: 16px;
+      }
+
+      .navbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .navbar-link {
+        padding: 10px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--sp-text);
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: background 0.15s ease;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        font: inherit;
+      }
+
+      .navbar-link:hover {
+        background: var(--sp-surface);
+      }
+
+      @media (max-width: 900px) {
+        .navbar-right {
+          display: none;
+        }
+      }
+
+      .page {
+        padding: 32px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .menu-trigger {
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: #fff;
+        border: 1px solid var(--sp-accent);
+        background: var(--sp-accent);
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s ease, border-color 0.2s ease;
+        gap: .5rem;
+        display: flex;
+        align-items: center;
+        align-content: center;
+        flex-direction: row;
+      }
+
+      .menu-trigger:hover {
+        background: var(--sp-accent-hover);
+        border-color: var(--sp-accent-hover);
+      }
+
+      .menu-trigger:focus-visible {
+        outline: 3px solid rgba(47, 107, 255, 0.3);
+        outline-offset: 2px;
+      }
+
+      .sp-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 8, 12, 0.4);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms ease;
+      }
+
+      .sp-overlay.is-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .sp-offcanvas {
+        position: fixed;
+        top: 65.5px;
+        left: 0;
+        height: calc(100% - 65.5px);
+        width: min(92vw, 340px);
+        background: var(--sp-bg);
+        box-shadow: var(--sp-shadow);
+        transform: translateX(-105%);
+        transition: transform 220ms ease;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .sp-offcanvas.is-open {
+        transform: translateX(0);
+      }
+
+      .sp-offcanvas.has-detail {
+        width: auto;
+        max-width: min(96vw, 680px);
+      }
+
+      .sp-offcanvas.has-subdetail {
+        max-width: min(96vw, 1020px);
+      }
+
+      .sp-offcanvas-header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 10px 16px;
+        gap: 12px;
+      }
+
+      .sp-close-btn {
+        border: none;
+        background: #f5f5f5;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 100px;
+        width: 32px;
+        height: 32px;
+      }
+
+      .sp-panel-body {
+        padding: 0;
+        overflow: hidden;
+        flex: 1;
+      }
+
+      .sp-menu-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        height: 100%;
+      }
+
+      .sp-menu-column {
+        overflow-y: auto;
+        border-right: 1px solid var(--sp-border);
+        background: #fff;
+        width: 340px;
+      }
+
+      .sp-detail-column {
+        overflow-y: auto;
+        background: #fff;
+        border-left: 1px solid var(--sp-border);
+        display: none;
+        width: 340px;
+      }
+
+      .sp-subdetail-column {
+        overflow-y: auto;
+        background: #fff;
+        border-left: 1px solid var(--sp-border);
+        display: none;
+        width: 340px;
+      }
+
+      .sp-offcanvas.has-detail .sp-menu-grid {
+        grid-template-columns: auto auto;
+      }
+
+      .sp-offcanvas.has-detail .sp-detail-column {
+        display: block;
+      }
+
+      .sp-offcanvas.has-subdetail .sp-menu-grid {
+        grid-template-columns: auto auto auto;
+      }
+
+      .sp-offcanvas.has-subdetail .sp-subdetail-column {
+        display: block;
+      }
+
+      .sp-menu-list {
+        display: grid;
+      }
+
+      .sp-menu-item {
+        display: block;
+      }
+
+      .sp-menu-link,
+      .sp-menu-button {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--sp-border);
+        padding: 16px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
+        text-decoration: none;
+        color: var(--sp-text);
+        font-weight: 600;
+        cursor: pointer;
+        font: inherit;
+        min-height: 56px;
+      }
+
+      .sp-menu-link:hover,
+      .sp-menu-button:hover {
+        background: var(--sp-surface);
+      }
+
+      .sp-menu-button.is-active {
+        background: var(--sp-surface);
+      }
+
+      .sp-menu-button {
+        border-color: var(--sp-border);
+      }
+
+      .sp-menu-button span,
+      .sp-menu-link span {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sp-menu-arrow {
+        font-size: 0.85rem;
+        color: var(--sp-muted);
+      }
+
+
+      .sp-menu-featured-image-link {
+    padding: 16px;
+    overflow: hidden;
+    width: 100%;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.sp-menu-featured-image-link img:hover {
+  transform: scale(1.01) translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sp-menu-featured-image-link img {
+  width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+      .sp-menu-section {
+        margin-bottom: 18px;
+        display: grid;
+      }
+
+      .sp-menu-section-title {
+        margin: 0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+        padding: 16px;
+        color: var(--sp-text);
+        font-weight: 700;
+        border-bottom: 1px solid var(--sp-border);
+        min-height: 56px;
+      }
+
+      .sp-drilldown-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        border-bottom: 1px solid var(--sp-border);
+        min-height: 56px;
+        gap: 12px;
+      }
+
+      .sp-drilldown-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .sp-drilldown-title {
+        margin: 0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+        color: var(--sp-text);
+        font-weight: 700;
+      }
+
+      .sp-drilldown-view-all {
+        text-decoration: none;
+        color: var(--sp-accent);
+        font-weight: 600;
+        font-size: 0.9rem;
+        white-space: nowrap;
+      }
+
+      .sp-drilldown-view-all::after {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        content: "\f054";
+        font-size: 0.7rem;
+        margin-left: 6px;
+      }
+
+      .sp-menu-item-cta {
+        width: 100%;
+      }
+
+      .sp-menu-item-cta .sp-menu-link {
+        color: var(--sp-text);
+        width: 100%;
+        border: none;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        padding: 16px;
+        gap: 8px;
+        justify-content: flex-start;
+      }
+
+      .sp-menu-item-cta .sp-menu-link::after {
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        content: "\f054";
+        font-size: 0.75rem;
+        margin-left: 4px;
+      }
+
+      .sp-drilldown {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        opacity: 0;
+        pointer-events: none;
+        overflow-y: auto;
+        height: 100%;
+        transform: translateX(8px);
+        transition: opacity 200ms ease, transform 200ms ease;
+      }
+
+      .sp-drilldown.is-open {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+        animation: drilldownFadeIn 200ms ease forwards;
+      }
+
+      @keyframes drilldownFadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .sp-drilldown .sp-menu-list {
+        display: block;
+        padding: 0;
+        gap: 0;
+      }
+
+      .sp-drilldown.is-open .sp-menu-item {
+        animation: menuItemFadeIn 250ms ease forwards;
+        opacity: 0;
+      }
+
+      .sp-drilldown.is-open .sp-menu-item:nth-child(1) { animation-delay: 20ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(2) { animation-delay: 40ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(3) { animation-delay: 60ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(4) { animation-delay: 80ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(5) { animation-delay: 100ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(6) { animation-delay: 120ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(7) { animation-delay: 140ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(8) { animation-delay: 160ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(9) { animation-delay: 180ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(10) { animation-delay: 200ms; }
+      .sp-drilldown.is-open .sp-menu-item:nth-child(n+11) { animation-delay: 220ms; }
+
+      @keyframes menuItemFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .sp-drilldown .sp-menu-item .sp-menu-link,
+      .sp-drilldown .sp-menu-item .sp-menu-button {
+        border-bottom: 1px solid var(--sp-border);
+        padding: 16px;
+        min-height: 56px;
+      }
+
+      .sp-subdrilldown {
+        display: none;
+        flex-direction: column;
+        background: #fff;
+        opacity: 0;
+        pointer-events: none;
+        overflow-y: auto;
+        height: 100%;
+        transform: translateX(8px);
+        transition: opacity 200ms ease, transform 200ms ease;
+      }
+
+      .sp-subdrilldown.is-open {
+        display: flex;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+        animation: subdrilldownFadeIn 200ms ease forwards;
+      }
+
+      @keyframes subdrilldownFadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .sp-subdrilldown .sp-menu-list {
+        display: block;
+        padding: 0;
+        gap: 0;
+      }
+
+      .sp-subdrilldown.is-open .sp-menu-item {
+        animation: menuItemFadeIn 250ms ease forwards;
+        opacity: 0;
+      }
+
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(1) { animation-delay: 20ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(2) { animation-delay: 40ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(3) { animation-delay: 60ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(4) { animation-delay: 80ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(5) { animation-delay: 100ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(6) { animation-delay: 120ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(7) { animation-delay: 140ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(8) { animation-delay: 160ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(9) { animation-delay: 180ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(10) { animation-delay: 220ms; }
+      .sp-subdrilldown.is-open .sp-menu-item:nth-child(n+11) { animation-delay: 240ms; }
+
+      .sp-subdrilldown .sp-menu-item .sp-menu-link {
+        border-bottom: 1px solid var(--sp-border);
+        padding: 16px;
+        min-height: 56px;
+        font-weight: 400;
+      }
+
+      .sp-drilldown-back {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f5f5f5;
+        border-radius: 100px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--sp-text);
+        flex-shrink: 0;
+      }
+
+      .sp-drilldown-back:hover {
+        background: var(--sp-border);
+      }
+
+      @media (min-width: 900px) {
+        .sp-offcanvas {
+          width: auto;
+        }
+
+        .sp-offcanvas.has-detail {
+          width: auto;
+          max-width: min(96vw, 680px);
+        }
+
+        .sp-offcanvas.has-subdetail {
+          width: auto;
+          max-width: min(96vw, 1020px);
+        }
+      }
+
+      @media (max-width: 991px) {
+        .sp-offcanvas {
+          width: 90vw;
+          top: 0;
+          height: 100vh;
+          z-index: 1000;
+        }
+
+        .sp-overlay.is-open {
+          z-index: 5;
+        }
+
+        .navbar {
+          z-index: 4;
+        }
+
+        .sp-offcanvas.has-detail {
+          width: 90vw;
+          max-width: 90vw;
+        }
+
+        .sp-offcanvas.has-subdetail {
+          width: 90vw;
+          max-width: 90vw;
+        }
+
+        .sp-menu-grid {
+          grid-template-columns: 1fr;
+          position: relative;
+        }
+
+        .sp-menu-column {
+          width: 100%;
+        }
+
+        .sp-detail-column {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          min-width: unset;
+          width: 100%;
+          transform: translateX(100%);
+          transition: transform 220ms ease;
+          display: block;
+          border-left: none;
+          z-index: 10;
+        }
+
+        .sp-subdetail-column {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          min-width: unset;
+          width: 100%;
+          transform: translateX(100%);
+          transition: transform 220ms ease;
+          display: block;
+          border-left: none;
+          z-index: 20;
+        }
+
+        .sp-offcanvas.has-detail .sp-detail-column {
+          transform: translateX(0);
+        }
+
+        .sp-offcanvas.has-subdetail .sp-subdetail-column {
+          transform: translateX(0);
+        }
+
+        .sp-offcanvas.has-detail .sp-menu-grid,
+        .sp-offcanvas.has-subdetail .sp-menu-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sp-drilldown-back {
+          display: flex;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <div class="navbar-left">
+          <button class="menu-trigger" id="openMenu"><i class="fa-solid fa-bars"></i> Menu</button>
+        </div>
+        <div class="navbar-right">
+          <button class="navbar-link" data-nav-drilldown="wedding">Trouwen</button>
+          <button class="navbar-link" data-nav-drilldown="birth">Geboorte</button>
+          <button class="navbar-link" data-nav-drilldown="birthday">Verjaardag</button>
+          <button class="navbar-link" data-nav-drilldown="gifts">Cadeaus</button>
+          <button class="navbar-link" data-nav-drilldown="jubilee">Jubileum</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="page">
+      <p>
+        Demo voor een side panel / off-canvas navigatie met 3 kolommen: hoofdmenu → subcategorieën → items.
+      </p>
+    </div>
+
+    <div class="sp-overlay" id="overlay"></div>
+    <aside class="sp-offcanvas" id="offcanvas" aria-hidden="true">
+      <div class="sp-offcanvas-header">
+        <button class="sp-close-btn" id="closeMenu" aria-label="Sluit menu"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="sp-panel-body">
+        <div class="sp-menu-grid">
+          <!-- Kolom 1: Hoofdmenu -->
+          <div class="sp-menu-column">
+            <div class="sp-menu-section">
+              <h3 class="sp-menu-section-title">Categorieën</h3>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="cards">
+                    <span>Kaarten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="gifts">
+                    <span>Cadeaus</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="sp-menu-section">
+              <h3 class="sp-menu-section-title">Momenten</h3>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="birth">
+                    <span>Geboorte</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="wedding">
+                    <span>Trouwen</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="bruiloft">
+                    <span>Bruiloft</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="birthday">
+                    <span>Verjaardag</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="jubilee">
+                    <span>Jubileum</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="back2school">
+                    <span>Back2school</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="communie">
+                    <span>Communie, vormsel & doop</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="felicitatie">
+                    <span>Felicitatie</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="beterschap">
+                    <span>Beterschap</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom 2: Drilldown met subcategorieën -->
+          <div class="sp-detail-column">
+            <!-- Kaarten (met subdrilldown voor Felicitatie) -->
+            <div class="sp-drilldown" id="drilldown-cards" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Kaarten</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten"><span>Trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes"><span>Geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken"><span>Uitnodigingen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag"><span>Verjaardagsuitnodigingen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten"><span>Jubileumkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kinderfeestje</span></a></div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="cards-felicitatie">
+                    <span>Felicitatie</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/condoleancekaart"><span>Condoleance</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/sterkte-kaart"><span>Sterkte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/ikdenkaanje"><span>Zomaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Beterschap</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Wenskaarten zelf maken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Alle categorieën</span></a></div>
+              </div>
+            </div>
+
+            <!-- Cadeaus (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-gifts" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Cadeaus</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="gifts-kraamcadeaus">
+                    <span>Kraamcadeaus</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/doopcadeau"><span>Doopcadeaus</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/huwelijk"><span>Huwelijkcadeaus</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/fotocadeau"><span>Fotocadeau</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/zakelijk"><span>Relatiegeschenken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/getuigen-vragen"><span>Getuigen vragen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus"><span>Alle cadeaus</span></a></div>
+              </div>
+            </div>
+
+            <!-- Trouwen (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-wedding" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwen</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="wedding-trouwkaarten">
+                    <span>Trouwkaarten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="wedding-trouwuitnodigingen">
+                    <span>Trouwuitnodigingen</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="wedding-decoratie">
+                    <span>Bruiloftdecoratie</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="wedding-extras">
+                    <span>Voor bij de kaart</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="wedding-bedankjes">
+                    <span>Trouwbedankjes</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+
+              <a href="#" class="sp-menu-featured-image-link"><img src="/Users/rob/side-panel-menu/img/megamenu-trouwkaarten.webp" alt="Featured Image"></a>
+            </div>
+
+            <!-- Geboorte (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-birth" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geboorte</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birth-kaartje">
+                    <span>Geboortekaartje</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birth-vooraf">
+                    <span>Vooraf aan de geboorte</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birth-producten">
+                    <span>Geboorteproducten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birth-extras">
+                    <span>Voor bij de kaart</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birth-kraamcadeaus">
+                    <span>Kraamcadeaus</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+
+              <a href="#" class="sp-menu-featured-image-link"><img src="/Users/rob/side-panel-menu/img/megamenu-geboortekaartjes.webp" alt="Featured Image"></a>
+            </div>
+
+            <!-- Verjaardag (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-birthday" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Verjaardag</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birthday-uitnodigingen">
+                    <span>Verjaardagsuitnodigingen</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birthday-kaarten">
+                    <span>Verjaardagskaarten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="birthday-cadeaus">
+                    <span>Verjaardagscadeaus</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+
+              <a href="#" class="sp-menu-featured-image-link"><img src="/Users/rob/side-panel-menu/img/megamenu-uitnodigingen.webp" alt="Featured Image"></a>
+            </div>
+
+            <!-- Jubileum (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-jubilee" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Jubileum</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="jubilee-uitnodiging">
+                    <span>Uitnodiging jubileum</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="jubilee-kaarten">
+                    <span>Jubileumkaarten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Back2school (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-back2school" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Back2school</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="back2school-rugzakken">
+                    <span>Rugzakken</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="back2school-trommels">
+                    <span>Trommels en bekers</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="back2school-accessoires">
+                    <span>Accessoires</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bruiloft (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-bruiloft" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Bruiloft</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <a class="sp-menu-link" href="/trouwkaarten/bruiloft-decoratie"><span>Alle bruiloftdecoratie</span></a>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-musthaves">
+                    <span>Ontdek onze musthaves</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-welkom">
+                    <span>Welkom & Ceremonie</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-tafeldecoratie">
+                    <span>Tafeldecoratie bruiloft</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-cadeautafel">
+                    <span>Cadeautafel & Bedankjes</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-trouwkaart">
+                    <span>Voor bij de trouwkaart</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="bruiloft-herinnering">
+                    <span>Herinnering & Foto's</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+
+              <a href="#" class="sp-menu-featured-image-link"><img src="/Users/rob/side-panel-menu/img/megamenu-bruiloftdeco.webp" alt="Featured Image"></a>
+            </div>
+
+            <!-- Felicitatie (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-felicitatie" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Felicitatie</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-geboorte">
+                    <span>Geboorte</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-zwangerschap">
+                    <span>Zwangerschap</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-trouwen">
+                    <span>Trouwen</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-woning">
+                    <span>Nieuwe woning</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-werk">
+                    <span>Werk</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="felicitatie-geslaagd">
+                    <span>Geslaagd</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Communie, vormsel & doop (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-communie" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Communie, vormsel & doop</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <a class="sp-menu-link" href="/uitnodiging-maken/doop"><span>Uitnodigingen doop</span></a>
+                </div>
+                <div class="sp-menu-item">
+                  <a class="sp-menu-link" href="/uitnodiging-maken/communiekaartjes"><span>Uitnodigingen communie</span></a>
+                </div>
+                <div class="sp-menu-item">
+                  <a class="sp-menu-link" href="/uitnodiging-maken/vormsel"><span>Uitnodigingen vormsel</span></a>
+                </div>
+                <div class="sp-menu-item">
+                  <a class="sp-menu-link" href="/uitnodiging-maken/lentefeest"><span>Uitnodigingen lentefeest</span></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Beterschap (met subcategorieën) -->
+            <div class="sp-drilldown" id="drilldown-beterschap" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Beterschap</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="beterschap-gelegenheid">
+                    <span>Gelegenheid</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="beterschap-ontvanger">
+                    <span>Ontvanger</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kolom 3: Subdrilldown met items -->
+          <div class="sp-subdetail-column">
+            <!-- Trouwen subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-wedding-trouwkaarten" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwkaarten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten"><span>Alle trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten"><span>Trouwuitnodigingen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/save-the-date-kaarten"><span>Save the date kaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankkaartjes-bruiloft"><span>Bedankkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankkaartjes-bruiloft"><span>Felicitatie huwelijk</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/verlovingskaarten"><span>Verlovingskaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/geregistreerd-partnerschap"><span>Geregistreerd partnerschap</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/getuigen-vragen"><span>Getuige vragen</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-wedding-trouwuitnodigingen" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwuitnodigingen</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten"><span>Alle trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/nieuwe-trouwkaarten"><span>Nieuwste trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trends"><span>Trouwcollectie 2026</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/hippe-trouwkaarten"><span>Hippe trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/klassieke-trouwkaarten"><span>Klassieke trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/speciale-kaarten"><span>Bijzondere trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/floral"><span>Trouwkaarten met bloemen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/romantische-trouwkaarten"><span>Romantische trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwkaart-met-foto"><span>Trouwkaarten met foto</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/pocketfold-trouwkaart"><span>Pocketfold trouwkaart</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/labels"><span>Trouwkaarten met label</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/zelf-trouwkaarten-maken"><span>Zelf trouwkaarten maken</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-wedding-decoratie" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Bruiloftdecoratie</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bruiloft-decoratie"><span>Alle bruiloftsdecoratie</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord"><span>Bruiloftsbord</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/drukwerk-voor-op-de-dag"><span>Ceremonie drukwerk</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/gastenboek"><span>Gastenboek</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/menukaarten-bruiloft"><span>Menukaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/naamkaartjes"><span>Naamkaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwbedankjes"><span>Trouwbedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord"><span>Welkomstbord</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/fles-etiket"><span>Wijnetiketten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/enveloppendoos"><span>Enveloppendoos</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/spiegelsticker-bruiloft"><span>Spiegelsticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/sluitzegels"><span>Stickers</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-wedding-extras" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Voor bij de kaart</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/voor-bij-de-kaart"><span>Alles voor bij de kaart</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/enveloppen-info"><span>Enveloppen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/sluitzegels-bewerkbaar"><span>Sluitzegels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/adresstickers"><span>Adresstickers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/labeltjes"><span>Labeltjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/ceremoniemeester-brief"><span>Ceremoniemeester brief</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/dresscode"><span>Dresscode kaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/enveloppen-info#inlays"><span>Envelop inlays</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bellyband"><span>Bellybands & Omslagen</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-wedding-bedankjes" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwbedankjes</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwbedankjes"><span>Alle trouwbedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/sterretjes-bruiloft"><span>Sterretjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/memory-box"><span>Memorybox</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bewaarbundel-bruiloft"><span>Bewaarbundel</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankkaartjes-bruiloft"><span>Bedankkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=doosje"><span>Doosjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=trouwbedankjes-labels"><span>Labels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=snoepzakje"><span>Snoepzakjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft/trouwbedankjes-chocolade"><span>Bedankjes chocolade</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=trouwbedankjes-stickers"><span>Stickers bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft/groene-bedankjes-bruiloft"><span>Groene bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=lollyhoesje"><span>Lollyhoesjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/katerwater"><span>Katerwater etiketten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bevestigingsmateriaal"><span>Bevestigingsmateriaal</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft"><span>Bedankjes voor getuigen en ceremoniemeesters</span></a></div>
+              </div>
+
+             
+            </div>
+
+            <!-- Geboorte subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-birth-kaartje" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geboortekaartje</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/geboortekaartjes-jongen"><span>Geboortekaartje jongen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/geboortekaartjes-meisje"><span>Geboortekaartje meisje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/neutrale-geboortekaartjes"><span>Neutrale geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/zelf-geboortekaartjes-maken"><span>Zelf geboortekaartje maken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes"><span>Bekijk alle geboortekaartjes</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birth-vooraf" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Vooraf aan de geboorte</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/enveloppen"><span>Enveloppen bestellen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/aankondiging-zwangerschap"><span>Zwangerschapsaankondiging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/gender-reveal"><span>Gender reveal</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/babyshower/babyshower-uitnodiging"><span>Babyshower</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birth-producten" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geboorteproducten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/geboortebord"><span>Geboorteborden</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/kraambezoekboek"><span>Kraambezoekboeken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/doopsuiker"><span>Doopsuikers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Kraamcadeaus</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboorteproducten"><span>Alle geboorteproducten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birth-extras" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Voor bij de kaart</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/enveloppen"><span>Envelop (vooraf) bestellen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/sluitzegels-bewerkbaar"><span>Sluitsticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/adresstickers"><span>Adresstickers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/enveloppen-extra"><span>Bekijk alle producten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birth-kraamcadeaus" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Kraamcadeaus</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle kraamcadeaus</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/geboorteposter"><span>Geboorteposter</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/memory-box"><span>Memorybox geboorte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/bewaarbundel-geboortekaartjes"><span>Bewaarbundel geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/geboortetegel"><span>Geboortetegeltje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/luiertas-met-naam"><span>Luiertas met naam</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle producten</span></a></div>
+              </div>
+            </div>
+
+            <!-- Verjaardag subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-birthday-uitnodigingen" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Verjaardagsuitnodigingen</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-50-jaar"><span>50 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zestig"><span>60 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zeventig"><span>70 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=tachtig"><span>80 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kinderfeestje uitnodiging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/zelf-uitnodigingen-maken"><span>Zelf uitnodiging maken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag"><span>Alle uitnodigingen verjaardag</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birthday-kaarten" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Verjaardagskaarten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/verjaardagsuitnodiging-man"><span>Man</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/verjaardagsuitnodiging-vrouw"><span>Vrouw</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kind</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Met foto</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/verjaardagskaart"><span>Alle verjaardagskaarten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-birthday-cadeaus" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Verjaardagscadeaus</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Man</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Vrouw</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Kind</span></a></div>
+              </div>
+            </div>
+
+            <!-- Jubileum subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-jubilee-uitnodiging" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Uitnodiging jubileum</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten?filters=tien"><span>10 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten/12-5-jaar-getrouwd"><span>12,5 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten/25-jaar-getrouwd"><span>25 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten?filters=veertig"><span>40 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten/50-jaar-getrouwd"><span>50 jaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten/60-jaar-getrouwd"><span>60 jaar</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-jubilee-kaarten" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Jubileumkaarten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten"><span>Felicitatie jubileum</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Jubileum medewerker</span></a></div>
+              </div>
+            </div>
+
+            <!-- Cadeaus subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-gifts-kraamcadeaus" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Kraamcadeaus</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-jongen"><span>Kraamcadeaus Jongen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-meisje"><span>Kraamcadeaus meisje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=babymutsje,badcape,badjas,doucheschuim,happy-horse,happy-horse-knuffeldoekje,hydrofiel,rompertje,slabbetje"><span>Kleding & Verzorging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=etui,hydrofiel,logeerkoffertje,mombag,rugtas,teddy-rugzakje"><span>Onderweg</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=bewaarbundel,foto-en-wanddecoratie,groeimeter,houten-koffertje,houten-spaarpot,lakentje,memorybox,meubelstickers,mombag,speelgoedmand"><span>Baby & Kinderkamer</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=chocolade-wikkel,doucheschuim,fles-etiket,mombag"><span>Voor mama</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle kraamcadeaus</span></a></div>
+              </div>
+            </div>
+
+            <!-- Back2school subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-back2school-rugzakken" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Rugzakken</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/rugzakken"><span>Bekijk alle rugzakken</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Adventure rugzak (0-6 jaar)</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Classic rugzak (0-8 jaar)</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Junior rugzak (vanaf 6 jaar)</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/rugzak-met-naam"><span>Teddy rugzak</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Gymtassen</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-back2school-trommels" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trommels en bekers</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Alle broodtrommels en Bekers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Broodtrommels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Schoolbekers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>RVS drinkflessen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Waterflessen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Doppers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Fruitboxen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Schoolsets</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-back2school-accessoires" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Accessoires</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Alle Accessoires</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Naamstickers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Etuis</span></a></div>
+              </div>
+            </div>
+
+            <!-- Felicitatie subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-geboorte" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geboorte</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte?filters=dochter"><span>Geboorte dochter</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte?filters=zoon"><span>Geboorte zoon</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte?filters=tweeling"><span>Geboorte tweeling</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte?filters=opa-oma"><span>Geboorte kleindochter</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte?filters=opa-oma"><span>Geboorte kleinzoon</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-zwangerschap" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Zwangerschap</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-zwangerschap"><span>Zwangerschapsverlof</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-zwangerschap"><span>Zwangerschap felicitatie</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-trouwen" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwen</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/verlovingskaarten"><span>Verloofd</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Felicitatie huwelijk</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/geregistreerd-partnerschap"><span>Geregistreerd partnerschap</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten"><span>Huwelijksjubileum</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-woning" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Nieuwe woning</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/verhuiskaarten"><span>Verhuisd</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Samenwonen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Emigratie</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-werk" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Werk</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Nieuwe baan</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Nieuwe zaak</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Pensioen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Jubileum</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-felicitatie-geslaagd" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geslaagd</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Rijbewijs</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Diploma</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Zwemdiploma</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Propedeuse</span></a></div>
+              </div>
+            </div>
+
+            <!-- Bruiloft subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-musthaves" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Ontdek onze musthaves</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord"><span>Welkomstborden</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/gastenboek"><span>Gastenboek</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/menukaarten-bruiloft"><span>Menukaart</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/naamkaartjes"><span>Naamkaartje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwbedankjes"><span>Bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/enveloppendoos"><span>Enveloppendoos</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-welkom" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Welkom & Ceremonie</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord"><span>Bruiloftsbord</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord/programmabord"><span>Programmabord</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/liturgie-trouwdienst"><span>Liturgie</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/gelofte-boekje-bruiloft"><span>Gelofte boekje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwakte"><span>Trouwakte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/kinderakte"><span>Kinderakte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/happytears"><span>Happy tears</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/spiegelsticker-bruiloft"><span>Spiegelstickers</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-tafeldecoratie" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Tafeldecoratie bruiloft</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bruiloftsbord/tafelschikking"><span>Tafelschikking</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/menukaarten-bruiloft"><span>Menukaart</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/tafelnummers-bruiloft"><span>Tafelnummer</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/naamkaartjes"><span>Naamkaartje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/placemats"><span>Placemat</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/fles-etiket"><span>Wijnetiket</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/glaslabels-bruiloft"><span>Glaslabels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Servetwikkel</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/servetten-bruiloft"><span>Servetten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/stoel-versiering-bruiloft"><span>Stoel versiering</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-cadeautafel" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Cadeautafel & Bedankjes</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwbedankjes"><span>Alle trouwbedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/gastenboek"><span>Gastenboek</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/enveloppendoos"><span>Enveloppendoos</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/trouwbedankjes"><span>Bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/sterretjes-bruiloft"><span>Sterretjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/memory-box"><span>Memorybox</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bewaarbundel-bruiloft"><span>Bewaarbundel</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankkaartjes-bruiloft"><span>Bedankkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=doosje"><span>Doosjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=trouwbedankjes-labels"><span>Labels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=snoepzakje"><span>Snoepzakjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft/trouwbedankjes-chocolade"><span>Bedankjes chocolade</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=trouwbedankjes-stickers"><span>Stickers bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft/groene-bedankjes-bruiloft"><span>Groene bedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft?filters=lollyhoesje"><span>Lollyhoesjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/katerwater"><span>Katerwater etiketten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/bevestigingsmateriaal"><span>Bevestigingsmateriaal</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankjes-bruiloft"><span>Bedankjes voor getuigen en ceremoniemeesters</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-trouwkaart" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Voor bij de trouwkaart</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/sluitzegels-bewerkbaar"><span>Sluitsticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/adresstickers"><span>Adressticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/labeltjes"><span>Labeltje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/save-the-date-kaarten"><span>Save the date kaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/dagprogramma"><span>Dagprogrammakaartje</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-bruiloft-herinnering" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Herinnering & Foto's</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/memory-box"><span>Memorybox</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bewaarbundel-bruiloft"><span>Houten bewaarbundel</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/verjaardagskalender-trouwfoto"><span>Fotokalender</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/huwelijksposter"><span>Poster van trouwkaart</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/tegels/tegels-maken?filters=bruiloft"><span>Tegeltje bruiloft</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/huwelijksposter"><span>Huwelijksposter</span></a></div>
+              </div>
+            </div>
+
+            <!-- Kaarten - Felicitatie subcategorie -->
+            <div class="sp-subdrilldown" id="subdrilldown-cards-felicitatie" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Felicitatie</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Alle felicitatiekaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-geboorte"><span>Felicitatie geboorte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/bedankkaartjes-bruiloft"><span>Felicitatie huwelijk</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/verjaardagskaart"><span>Felicitatie verjaardag</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten"><span>Felicitatie jubileum</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/felicitatie-zwangerschap"><span>Felicitatie zwangerschap</span></a></div>
+              </div>
+            </div>
+
+            <!-- Beterschap subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-beterschap-gelegenheid" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Gelegenheid</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Alle beterschapskaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Beterschap</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Ernstig ziek</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Mentale gezondheid</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Botbreuk</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Operatie en revalidatie</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Welkom thuis</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Opvrolijken</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-beterschap-ontvanger" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Ontvanger</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Alle beterschapskaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Vrouw</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Man</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Meisje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Jongen</span></a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <script>
+      const openMenu = document.getElementById("openMenu");
+      const closeMenu = document.getElementById("closeMenu");
+      const overlay = document.getElementById("overlay");
+      const offcanvas = document.getElementById("offcanvas");
+
+      // Collect all drilldowns and subdrilldowns
+      const drilldowns = {};
+      document.querySelectorAll(".sp-drilldown").forEach((el) => {
+        drilldowns[el.id.replace("drilldown-", "")] = el;
+      });
+
+      const subdrilldowns = {};
+      document.querySelectorAll(".sp-subdrilldown").forEach((el) => {
+        subdrilldowns[el.id.replace("subdrilldown-", "")] = el;
+      });
+
+      // Close all drilldowns
+      const closeAllDrilldowns = () => {
+        Object.values(drilldowns).forEach((panel) => {
+          panel.classList.remove("is-open");
+          panel.setAttribute("aria-hidden", "true");
+        });
+        // Remove active state from all drilldown buttons
+        document.querySelectorAll("[data-drilldown]").forEach((btn) => {
+          btn.classList.remove("is-active");
+        });
+      };
+
+      // Close all subdrilldowns
+      const closeAllSubdrilldowns = () => {
+        Object.values(subdrilldowns).forEach((panel) => {
+          panel.classList.remove("is-open");
+          panel.setAttribute("aria-hidden", "true");
+        });
+        // Remove active state from all subdrilldown buttons
+        document.querySelectorAll("[data-subdrilldown]").forEach((btn) => {
+          btn.classList.remove("is-active");
+        });
+      };
+
+      // Open/close menu
+      let scrollPosition = 0;
+      const setMenuOpen = (isOpen) => {
+        offcanvas.classList.toggle("is-open", isOpen);
+        overlay.classList.toggle("is-open", isOpen);
+        offcanvas.setAttribute("aria-hidden", String(!isOpen));
+        
+        if (isOpen) {
+          // Bewaar scrollpositie en blokkeer scrollen
+          scrollPosition = window.pageYOffset;
+          document.documentElement.classList.add("sp-menu-open");
+          document.body.classList.add("sp-menu-open");
+          document.body.style.top = `-${scrollPosition}px`;
+        } else {
+          // Herstel scrollpositie
+          document.documentElement.classList.remove("sp-menu-open");
+          document.body.classList.remove("sp-menu-open");
+          document.body.style.top = "";
+          window.scrollTo(0, scrollPosition);
+          
+          offcanvas.classList.remove("has-detail", "has-subdetail");
+          closeAllDrilldowns();
+          closeAllSubdrilldowns();
+        }
+      };
+
+      openMenu.addEventListener("click", () => setMenuOpen(true));
+      closeMenu.addEventListener("click", () => setMenuOpen(false));
+      overlay.addEventListener("click", () => setMenuOpen(false));
+
+      // Mobiele hamburger menu toggle (navigation-bar)
+      // Vervangt het standaard navigation-bar-footer menu met het sp-offcanvas menu
+      const mobileHamburger = document.querySelector('.navigation-bar-toggle[data-testid="navigation-bar-hamburger"]');
+      if (mobileHamburger) {
+        // Capture phase event listener - wordt als EERSTE uitgevoerd
+        document.addEventListener("click", (e) => {
+          const hamburger = e.target.closest('.navigation-bar-toggle[data-testid="navigation-bar-hamburger"]');
+          if (hamburger) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            // Verwijder classes die door ander script worden toegevoegd
+            document.body.classList.remove('navigation-bar-expanded');
+            const oldMenu = document.querySelector('.navigation-bar-footer.d-lg-none');
+            if (oldMenu) {
+              oldMenu.classList.remove('open');
+            }
+            
+            // Open sp-offcanvas menu
+            setMenuOpen(true);
+          }
+        }, true); // true = capture phase, wordt als eerste uitgevoerd
+      }
+      
+      // Observer om classes te verwijderen als ze toch worden toegevoegd
+      const bodyObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            const body = document.body;
+            if (body.classList.contains('navigation-bar-expanded') && offcanvas.classList.contains('is-open')) {
+              body.classList.remove('navigation-bar-expanded');
+              const oldMenu = document.querySelector('.navigation-bar-footer.d-lg-none');
+              if (oldMenu) oldMenu.classList.remove('open');
+            }
+          }
+        });
+      });
+      bodyObserver.observe(document.body, { attributes: true });
+      
+      // Verberg het oude navigation-bar-footer menu met CSS
+      const oldMobileMenu = document.querySelector('.navigation-bar-footer.d-lg-none');
+      if (oldMobileMenu) {
+        oldMobileMenu.style.cssText = 'display: none !important; visibility: hidden !important;';
+      }
+
+      // Drilldown buttons (column 1 → column 2)
+      document.querySelectorAll("[data-drilldown]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.drilldown;
+          closeAllDrilldowns();
+          closeAllSubdrilldowns();
+          offcanvas.classList.remove("has-subdetail");
+
+          // Set active state
+          btn.classList.add("is-active");
+
+          if (drilldowns[target]) {
+            drilldowns[target].classList.add("is-open");
+            drilldowns[target].setAttribute("aria-hidden", "false");
+            offcanvas.classList.add("has-detail");
+          }
+        });
+      });
+
+      // Subdrilldown buttons (column 2 → column 3)
+      document.querySelectorAll("[data-subdrilldown]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.subdrilldown;
+          closeAllSubdrilldowns();
+
+          // Set active state
+          btn.classList.add("is-active");
+
+          if (subdrilldowns[target]) {
+            subdrilldowns[target].classList.add("is-open");
+            subdrilldowns[target].setAttribute("aria-hidden", "false");
+            offcanvas.classList.add("has-subdetail");
+          }
+        });
+      });
+
+      // Back buttons
+      document.querySelectorAll("[data-back='drilldown']").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          closeAllDrilldowns();
+          closeAllSubdrilldowns();
+          offcanvas.classList.remove("has-detail", "has-subdetail");
+        });
+      });
+
+      document.querySelectorAll("[data-back='subdrilldown']").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          closeAllSubdrilldowns();
+          offcanvas.classList.remove("has-subdetail");
+        });
+      });
+
+      // Navbar links open offcanvas with specific drilldown
+      document.querySelectorAll("[data-nav-drilldown]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const target = btn.dataset.navDrilldown;
+          setMenuOpen(true);
+          closeAllDrilldowns();
+          closeAllSubdrilldowns();
+          offcanvas.classList.remove("has-subdetail");
+
+          if (drilldowns[target]) {
+            drilldowns[target].classList.add("is-open");
+            drilldowns[target].setAttribute("aria-hidden", "false");
+            offcanvas.classList.add("has-detail");
+
+            // Set active state on corresponding menu button
+            const menuBtn = document.querySelector(`[data-drilldown="${target}"]`);
+            if (menuBtn) menuBtn.classList.add("is-active");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
