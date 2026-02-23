@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mega Menu Demo - Navbar met hover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      :root {
+        color-scheme: light;
+        --mm-bg: #ffffff;
+        --mm-surface: #f6f6f8;
+        --mm-text: #1b1b1f;
+        --mm-muted: #6b6b74;
+        --mm-border: #e8e8eb;
+        --mm-accent: #D07444;
+        --mm-accent-hover: #ac5a2e;
+        --mm-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--mm-bg);
+        color: var(--mm-text);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Header */
+      .header {
+        background: var(--mm-bg);
+        border-bottom: 1px solid var(--mm-border);
+        position: relative;
+        z-index: 1000;
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        max-width: 1520px;
+        margin: 0 auto;
+        gap: 24px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--mm-accent);
+        text-decoration: none;
+      }
+
+      .header-actions {
+        position: absolute;
+        right: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .header-action {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--mm-text);
+        font-weight: 500;
+        transition: background 0.15s ease;
+      }
+
+      .header-action:hover {
+        background: var(--mm-surface);
+      }
+
+      /* Main Navigation */
+      .main-nav {
+        background: var(--mm-bg);
+        border-bottom: 1px solid var(--mm-border);
+      }
+
+      .nav-container {
+        max-width: 1520px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .nav-list {
+        display: flex;
+        list-style: none;
+        gap: 0;
+        justify-content: center;
+      }
+
+      .nav-item {
+        position: relative;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 16px 20px;
+        text-decoration: none;
+        color: var(--mm-text);
+        font-weight: 400;
+        font-size: 14px;
+        transition: color 0.15s ease, background 0.15s ease;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .nav-link:hover,
+      .nav-item:hover .nav-link,
+      .nav-item.is-open .nav-link {
+        color: var(--mm-accent);
+        background: var(--mm-surface);
+      }
+
+      .nav-link i {
+        font-size: 0.7rem;
+        transition: transform 0.2s ease;
+      }
+
+      .nav-item:hover .nav-link i,
+      .nav-item.is-open .nav-link i {
+        transform: rotate(180deg);
+      }
+
+      /* Mega Menu */
+      .mega-menu {
+        position: fixed;
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+        width: calc(100% - 48px);
+        max-width: 1320px;
+        background: var(--mm-bg);
+        border: 1px solid var(--mm-border);
+        border-radius: 0 0 8px 8px;
+        box-shadow: var(--mm-shadow);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        z-index: 100;
+      }
+
+      .nav-item:hover .mega-menu,
+      .nav-item.is-open .mega-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .mega-menu-inner {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 400px;
+      }
+
+      /* Left column - Categories */
+      .mm-categories {
+        background: var(--mm-surface);
+        border-radius: 0 0 0 8px;
+        padding: 16px 0;
+        border-right: 1px solid var(--mm-border);
+      }
+
+      .mm-category {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        color: var(--mm-text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.15s ease, color 0.15s ease;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      .mm-category:hover,
+      .mm-category.is-active {
+        background: var(--mm-bg);
+        color: var(--mm-accent);
+      }
+
+      .mm-category i {
+        font-size: 0.7rem;
+        opacity: 0.5;
+      }
+
+      .mm-category:hover i,
+      .mm-category.is-active i {
+        opacity: 1;
+      }
+
+      .mm-category-link {
+        display: block;
+        padding: 12px 20px;
+        color: var(--mm-accent);
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.15s ease;
+        border-top: 1px solid var(--mm-border);
+        margin-top: 8px;
+      }
+
+      .mm-category-link:hover {
+        background: var(--mm-bg);
+      }
+
+      /* Middle column - Subcategories */
+      .mm-subcategories {
+        padding: 24px;
+        display: none;
+        border-radius: 0 0 8px 0;
+      }
+
+      .mm-subcategories.is-active {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        gap: 24px;
+      }
+
+      .mm-subcategories-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mm-subcategories-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--mm-text);
+      }
+
+      .mm-subcategories-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 24px;
+      }
+
+      .mm-subcat-link {
+        display: block;
+        padding: 8px 0;
+        color: var(--mm-text);
+        text-decoration: none;
+        transition: color 0.15s ease;
+      }
+
+      .mm-subcat-link:hover {
+        color: var(--mm-accent);
+      }
+
+      .mm-badge {
+        display: inline-block;
+        background: var(--mm-accent);
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-left: 6px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      /* Right column - Featured Image */
+      .mm-featured {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        background: var(--mm-surface);
+        border-radius: 8px;
+        padding: 16px;
+        margin: 0;
+        border: none;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s ease;
+      }
+
+      .mm-featured:hover {
+        background: var(--mm-border);
+      }
+
+      .mm-featured img {
+        width: 100%;
+        border-radius: 8px;
+        display: block;
+        object-fit: cover;
+        aspect-ratio: 1/1;
+      }
+
+      .mm-featured-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--mm-text);
+        margin-top: 12px;
+        line-height: 1.3;
+      }
+
+      .mm-featured-subtitle {
+        font-size: 0.85rem;
+        color: var(--mm-muted);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+
+      /* Default subcategory (shown when no hover) */
+      .mm-default {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: var(--mm-muted);
+      }
+
+      .mm-default-icon {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        opacity: 0.3;
+      }
+
+      /* Mega Menu - Meer dropdown */
+      .mega-menu-simple {
+        min-width: 280px;
+        padding: 16px 0;
+      }
+
+      .mega-menu-simple .mm-simple-link {
+        display: block;
+        padding: 12px 24px;
+        color: var(--mm-text);
+        text-decoration: none;
+        font-weight: 500;
+        transition: background 0.15s ease, color 0.15s ease;
+      }
+
+      .mega-menu-simple .mm-simple-link:hover {
+        background: var(--mm-surface);
+        color: var(--mm-accent);
+      }
+
+      /* Page content */
+      .page {
+        padding: 48px 24px;
+        max-width: 1520px;
+        margin: 0 auto;
+      }
+
+      .page h1 {
+        font-size: 2rem;
+        margin-bottom: 16px;
+      }
+
+      .page p {
+        color: var(--mm-muted);
+        max-width: 600px;
+        line-height: 1.7;
+      }
+
+      /* Mobile hamburger (hidden on desktop) */
+      .mobile-menu-btn {
+        display: none;
+        padding: 10px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 1.5rem;
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .main-nav {
+          display: none;
+        }
+
+        .mobile-menu-btn {
+          display: block;
+        }
+
+        .header-actions {
+          gap: 8px;
+        }
+
+        .header-action span {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-top">
+        <button class="mobile-menu-btn" aria-label="Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="/" class="logo">Logo</a>
+        <div class="header-actions">
+          <a href="/account" class="header-action">
+            <i class="fa-regular fa-user"></i>
+            <span>Account</span>
+          </a>
+          <a href="/winkelwagen" class="header-action">
+            <i class="fa-solid fa-shopping-bag"></i>
+            <span>Winkelwagen</span>
+          </a>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <div class="nav-container">
+          <ul class="nav-list">
+            <!-- Kaarten -->
+            <li class="nav-item" data-menu="kaarten">
+              <button class="nav-link">
+                Kaarten
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="kaarten-trouwkaarten">
+                      <span>Trouwkaarten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="kaarten-geboortekaartjes">
+                      <span>Geboortekaartjes</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="kaarten-uitnodigingen">
+                      <span>Uitnodigingen</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="kaarten-jubileumkaarten">
+                      <span>Jubileumkaarten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="kaarten-wenskaarten">
+                      <span>Wenskaarten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/kaarten" class="mm-category-link">Alle kaarten bekijken →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="kaarten-trouwkaarten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Trouwkaarten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten" class="mm-subcat-link">Alle trouwkaarten</a>
+                        <a href="/trouwkaarten/trends" class="mm-subcat-link">Trouwcollectie 2026 <span class="mm-badge">nieuw</span></a>
+                        <a href="/trouwkaarten/save-the-date-kaarten" class="mm-subcat-link">Save the date kaarten</a>
+                        <a href="/trouwkaarten/bedankkaartjes-bruiloft" class="mm-subcat-link">Bedankkaarten</a>
+                        <a href="/trouwkaarten/verlovingskaarten" class="mm-subcat-link">Verlovingskaarten</a>
+                        <a href="/trouwkaarten/geregistreerd-partnerschap" class="mm-subcat-link">Geregistreerd partnerschap</a>
+                        <a href="/trouwkaarten/getuigen-vragen" class="mm-subcat-link">Getuige vragen</a>
+                        <a href="/trouwkaarten/hippe-trouwkaarten" class="mm-subcat-link">Hippe trouwkaarten</a>
+                        <a href="/trouwkaarten/klassieke-trouwkaarten" class="mm-subcat-link">Klassieke trouwkaarten</a>
+                      </div>
+                    </div>
+                    <a href="/trouwkaarten" class="mm-featured">
+                      <img src="./img/megamenu-trouwkaarten.webp" alt="Trouwkaarten collectie">
+                      <span class="mm-featured-title">Trouwcollectie 2026</span>
+                      <span class="mm-featured-subtitle">Ontdek de nieuwste trends voor jullie grote dag</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="kaarten-geboortekaartjes">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Geboortekaartjes</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/geboortekaartjes" class="mm-subcat-link">Alle geboortekaartjes</a>
+                        <a href="/geboortekaartjes/geboortekaartjes-jongen" class="mm-subcat-link">Geboortekaartje jongen</a>
+                        <a href="/geboortekaartjes/geboortekaartjes-meisje" class="mm-subcat-link">Geboortekaartje meisje</a>
+                        <a href="/geboortekaartjes/neutrale-geboortekaartjes" class="mm-subcat-link">Neutrale geboortekaartjes</a>
+                        <a href="/geboortekaartjes/zelf-geboortekaartjes-maken" class="mm-subcat-link">Zelf geboortekaartje maken</a>
+                        <a href="/geboortekaartjes/aankondiging-zwangerschap" class="mm-subcat-link">Zwangerschapsaankondiging</a>
+                        <a href="/uitnodiging-maken/gender-reveal" class="mm-subcat-link">Gender reveal</a>
+                        <a href="/uitnodiging-maken/babyshower/babyshower-uitnodiging" class="mm-subcat-link">Babyshower</a>
+                      </div>
+                    </div>
+                    <a href="/geboortekaartjes" class="mm-featured">
+                      <img src="./img/megamenu-geboortekaartjes.webp" alt="Geboortekaartjes collectie">
+                      <span class="mm-featured-title">Unieke geboortekaartjes</span>
+                      <span class="mm-featured-subtitle">Vertel het mooiste nieuws met een persoonlijk kaartje</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="kaarten-uitnodigingen">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Uitnodigingen</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken" class="mm-subcat-link">Alle uitnodigingen</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag" class="mm-subcat-link">Verjaardagsuitnodigingen</a>
+                        <a href="/uitnodiging-maken/uitnodiging-kinderfeestje" class="mm-subcat-link">Kinderfeestje</a>
+                        <a href="/uitnodiging-maken/doop" class="mm-subcat-link">Uitnodigingen doop</a>
+                        <a href="/uitnodiging-maken/communiekaartjes" class="mm-subcat-link">Uitnodigingen communie</a>
+                        <a href="/uitnodiging-maken/vormsel" class="mm-subcat-link">Uitnodigingen vormsel</a>
+                        <a href="/uitnodiging-maken/lentefeest" class="mm-subcat-link">Uitnodigingen lentefeest</a>
+                        <a href="/uitnodiging-maken/zelf-uitnodigingen-maken" class="mm-subcat-link">Zelf uitnodiging maken</a>
+                      </div>
+                    </div>
+                    <a href="/uitnodiging-maken" class="mm-featured">
+                      <img src="./img/megamenu-uitnodigingen.webp" alt="Uitnodigingen collectie">
+                      <span class="mm-featured-title">Feestelijke uitnodigingen</span>
+                      <span class="mm-featured-subtitle">Maak van elk moment een onvergetelijk feest</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="kaarten-jubileumkaarten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Jubileumkaarten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/jubileumkaarten" class="mm-subcat-link">Alle jubileumkaarten</a>
+                        <a href="/jubileumkaarten?filters=tien" class="mm-subcat-link">10 jaar</a>
+                        <a href="/jubileumkaarten/12-5-jaar-getrouwd" class="mm-subcat-link">12,5 jaar</a>
+                        <a href="/jubileumkaarten/25-jaar-getrouwd" class="mm-subcat-link">25 jaar</a>
+                        <a href="/jubileumkaarten?filters=veertig" class="mm-subcat-link">40 jaar</a>
+                        <a href="/jubileumkaarten/50-jaar-getrouwd" class="mm-subcat-link">50 jaar</a>
+                        <a href="/jubileumkaarten/60-jaar-getrouwd" class="mm-subcat-link">60 jaar</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="kaarten-wenskaarten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Wenskaarten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/wenskaarten" class="mm-subcat-link">Alle wenskaarten</a>
+                        <a href="/wenskaarten/verjaardagskaart" class="mm-subcat-link">Verjaardagskaarten</a>
+                        <a href="/wenskaarten/felicitatie-geboorte" class="mm-subcat-link">Felicitatie geboorte</a>
+                        <a href="/wenskaarten/condoleancekaart" class="mm-subcat-link">Condoleance</a>
+                        <a href="/wenskaarten/sterkte-kaart" class="mm-subcat-link">Sterkte</a>
+                        <a href="/wenskaarten/beterschap-kaart" class="mm-subcat-link">Beterschap</a>
+                        <a href="/wenskaarten/ikdenkaanje" class="mm-subcat-link">Zomaar</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Cadeaus -->
+            <li class="nav-item" data-menu="cadeaus">
+              <button class="nav-link">
+                Cadeaus
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="cadeaus-kraamcadeaus">
+                      <span>Kraamcadeaus</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="cadeaus-doopcadeaus">
+                      <span>Doopcadeaus</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="cadeaus-huwelijkcadeaus">
+                      <span>Huwelijkcadeaus</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="cadeaus-fotocadeau">
+                      <span>Fotocadeau</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="cadeaus-relatiegeschenken">
+                      <span>Relatiegeschenken</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/cadeaus" class="mm-category-link">Alle cadeaus bekijken →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="cadeaus-kraamcadeaus">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Kraamcadeaus</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/cadeaus/kraamcadeau" class="mm-subcat-link">Alle kraamcadeaus</a>
+                        <a href="/cadeaus/kraamcadeau-jongen" class="mm-subcat-link">Kraamcadeaus jongen</a>
+                        <a href="/cadeaus/kraamcadeau-meisje" class="mm-subcat-link">Kraamcadeaus meisje</a>
+                        <a href="/cadeaus/kraamcadeau?filters=babymutsje,badcape,badjas" class="mm-subcat-link">Kleding & Verzorging</a>
+                        <a href="/cadeaus/kraamcadeau?filters=etui,hydrofiel,logeerkoffertje" class="mm-subcat-link">Onderweg</a>
+                        <a href="/cadeaus/kraamcadeau?filters=bewaarbundel,foto-en-wanddecoratie" class="mm-subcat-link">Baby & Kinderkamer</a>
+                        <a href="/cadeaus/kraamcadeau?filters=chocolade-wikkel,doucheschuim" class="mm-subcat-link">Voor mama</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="cadeaus-doopcadeaus">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Doopcadeaus</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/cadeaus/doopcadeau" class="mm-subcat-link">Alle doopcadeaus</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="cadeaus-huwelijkcadeaus">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Huwelijkcadeaus</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/cadeaus/huwelijk" class="mm-subcat-link">Alle huwelijkcadeaus</a>
+                        <a href="/trouwkaarten/getuigen-vragen" class="mm-subcat-link">Getuigen vragen</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="cadeaus-fotocadeau">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Fotocadeau</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/cadeaus/fotocadeau" class="mm-subcat-link">Alle fotocadeaus</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="cadeaus-relatiegeschenken">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Relatiegeschenken</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/zakelijk" class="mm-subcat-link">Alle relatiegeschenken</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Trouwen -->
+            <li class="nav-item" data-menu="trouwen">
+              <button class="nav-link">
+                Trouwen
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="trouwen-trouwkaarten">
+                      <span>Trouwkaarten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="trouwen-decoratie">
+                      <span>Bruiloftdecoratie</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="trouwen-extras">
+                      <span>Voor bij de kaart</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="trouwen-bedankjes">
+                      <span>Trouwbedankjes</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="trouwen-herinnering">
+                      <span>Herinnering & Foto's</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/trouwen" class="mm-category-link">Alles voor trouwen →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="trouwen-trouwkaarten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Trouwkaarten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten" class="mm-subcat-link">Alle trouwkaarten</a>
+                        <a href="/trouwkaarten/trends" class="mm-subcat-link">Trouwcollectie 2026 <span class="mm-badge">nieuw</span></a>
+                        <a href="/trouwkaarten/save-the-date-kaarten" class="mm-subcat-link">Save the date kaarten</a>
+                        <a href="/trouwkaarten/bedankkaartjes-bruiloft" class="mm-subcat-link">Bedankkaarten</a>
+                        <a href="/trouwkaarten/verlovingskaarten" class="mm-subcat-link">Verlovingskaarten</a>
+                        <a href="/trouwkaarten/geregistreerd-partnerschap" class="mm-subcat-link">Geregistreerd partnerschap</a>
+                        <a href="/trouwkaarten/getuigen-vragen" class="mm-subcat-link">Getuige vragen</a>
+                        <a href="/trouwkaarten/hippe-trouwkaarten" class="mm-subcat-link">Hippe trouwkaarten</a>
+                        <a href="/trouwkaarten/klassieke-trouwkaarten" class="mm-subcat-link">Klassieke trouwkaarten</a>
+                        <a href="/trouwkaarten/speciale-kaarten" class="mm-subcat-link">Bijzondere trouwkaarten</a>
+                        <a href="/trouwkaarten/floral" class="mm-subcat-link">Trouwkaarten met bloemen</a>
+                        <a href="/trouwkaarten/romantische-trouwkaarten" class="mm-subcat-link">Romantische trouwkaarten</a>
+                      </div>
+                    </div>
+                    <a href="/trouwkaarten/trends" class="mm-featured">
+                      <img src="./img/megamenu-trouwkaarten.webp" alt="Trouwkaarten collectie">
+                      <span class="mm-featured-title">Trouwcollectie 2026</span>
+                      <span class="mm-featured-subtitle">De mooiste kaarten voor jullie grote dag</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="trouwen-decoratie">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Bruiloftdecoratie</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten/bruiloft-decoratie" class="mm-subcat-link">Alle bruiloftsdecoratie</a>
+                        <a href="/bruiloftsbord" class="mm-subcat-link">Bruiloftsbord</a>
+                        <a href="/trouwkaarten/drukwerk-voor-op-de-dag" class="mm-subcat-link">Ceremonie drukwerk</a>
+                        <a href="/gastenboek" class="mm-subcat-link">Gastenboek</a>
+                        <a href="/trouwkaarten/menukaarten-bruiloft" class="mm-subcat-link">Menukaarten</a>
+                        <a href="/trouwkaarten/naamkaartjes" class="mm-subcat-link">Naamkaartjes</a>
+                        <a href="/trouwkaarten/trouwbedankjes" class="mm-subcat-link">Trouwbedankjes</a>
+                        <a href="/bruiloftsbord" class="mm-subcat-link">Welkomstbord</a>
+                        <a href="/trouwkaarten/fles-etiket" class="mm-subcat-link">Wijnetiketten</a>
+                        <a href="/trouwkaarten/enveloppendoos" class="mm-subcat-link">Enveloppendoos</a>
+                        <a href="/trouwkaarten/spiegelsticker-bruiloft" class="mm-subcat-link">Spiegelsticker</a>
+                        <a href="/sluitzegels" class="mm-subcat-link">Stickers</a>
+                      </div>
+                    </div>
+                    <a href="/trouwkaarten/bruiloft-decoratie" class="mm-featured">
+                      <img src="./img/megamenu-bruiloftdeco.webp" alt="Bruiloftdecoratie">
+                      <span class="mm-featured-title">Bruiloftdecoratie</span>
+                      <span class="mm-featured-subtitle">Van welkomstbord tot bedankjes</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="trouwen-extras">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Voor bij de kaart</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten/voor-bij-de-kaart" class="mm-subcat-link">Alles voor bij de kaart</a>
+                        <a href="/trouwkaarten/enveloppen-info" class="mm-subcat-link">Enveloppen</a>
+                        <a href="/trouwkaarten/sluitzegels-bewerkbaar" class="mm-subcat-link">Sluitzegels</a>
+                        <a href="/trouwkaarten/adresstickers" class="mm-subcat-link">Adresstickers</a>
+                        <a href="/trouwkaarten/labeltjes" class="mm-subcat-link">Labeltjes</a>
+                        <a href="/trouwkaarten/ceremoniemeester-brief" class="mm-subcat-link">Ceremoniemeester brief</a>
+                        <a href="/trouwkaarten/dresscode" class="mm-subcat-link">Dresscode kaartjes</a>
+                        <a href="/trouwkaarten/enveloppen-info#inlays" class="mm-subcat-link">Envelop inlays</a>
+                        <a href="/trouwkaarten/bellyband" class="mm-subcat-link">Bellybands & Omslagen</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="trouwen-bedankjes">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Trouwbedankjes</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten/trouwbedankjes" class="mm-subcat-link">Alle trouwbedankjes</a>
+                        <a href="/trouwkaarten/sterretjes-bruiloft" class="mm-subcat-link">Sterretjes</a>
+                        <a href="/trouwkaarten/memory-box" class="mm-subcat-link">Memorybox</a>
+                        <a href="/trouwkaarten/bewaarbundel-bruiloft" class="mm-subcat-link">Bewaarbundel</a>
+                        <a href="/trouwkaarten/bedankkaartjes-bruiloft" class="mm-subcat-link">Bedankkaarten</a>
+                        <a href="/trouwkaarten/bedankjes-bruiloft?filters=doosje" class="mm-subcat-link">Doosjes</a>
+                        <a href="/trouwkaarten/bedankjes-bruiloft?filters=trouwbedankjes-labels" class="mm-subcat-link">Labels</a>
+                        <a href="/trouwkaarten/bedankjes-bruiloft?filters=snoepzakje" class="mm-subcat-link">Snoepzakjes</a>
+                        <a href="/trouwkaarten/bedankjes-bruiloft/trouwbedankjes-chocolade" class="mm-subcat-link">Bedankjes chocolade</a>
+                        <a href="/trouwkaarten/katerwater" class="mm-subcat-link">Katerwater etiketten</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="trouwen-herinnering">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Herinnering & Foto's</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/trouwkaarten/memory-box" class="mm-subcat-link">Memorybox</a>
+                        <a href="/trouwkaarten/bewaarbundel-bruiloft" class="mm-subcat-link">Houten bewaarbundel</a>
+                        <a href="/wanddecoratie/verjaardagskalender-trouwfoto" class="mm-subcat-link">Fotokalender</a>
+                        <a href="/wanddecoratie/huwelijksposter" class="mm-subcat-link">Poster van trouwkaart</a>
+                        <a href="/wanddecoratie/tegels/tegels-maken?filters=bruiloft" class="mm-subcat-link">Tegeltje bruiloft</a>
+                        <a href="/wanddecoratie/huwelijksposter" class="mm-subcat-link">Huwelijksposter</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Geboorte -->
+            <li class="nav-item" data-menu="geboorte">
+              <button class="nav-link">
+                Geboorte
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="geboorte-kaartje">
+                      <span>Geboortekaartje</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="geboorte-vooraf">
+                      <span>Vooraf aan de geboorte</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="geboorte-producten">
+                      <span>Geboorteproducten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="geboorte-extras">
+                      <span>Voor bij de kaart</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="geboorte-kraamcadeaus">
+                      <span>Kraamcadeaus</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/geboorte" class="mm-category-link">Alles voor geboorte →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="geboorte-kaartje">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Geboortekaartje</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/geboortekaartjes" class="mm-subcat-link">Alle geboortekaartjes</a>
+                        <a href="/geboortekaartjes/geboortekaartjes-jongen" class="mm-subcat-link">Geboortekaartje jongen</a>
+                        <a href="/geboortekaartjes/geboortekaartjes-meisje" class="mm-subcat-link">Geboortekaartje meisje</a>
+                        <a href="/geboortekaartjes/neutrale-geboortekaartjes" class="mm-subcat-link">Neutrale geboortekaartjes</a>
+                        <a href="/geboortekaartjes/zelf-geboortekaartjes-maken" class="mm-subcat-link">Zelf geboortekaartje maken</a>
+                      </div>
+                    </div>
+                    <a href="/geboortekaartjes" class="mm-featured">
+                      <img src="./img/megamenu-geboortekaartjes.webp" alt="Geboortekaartjes collectie">
+                      <span class="mm-featured-title">Geboortekaartjes</span>
+                      <span class="mm-featured-subtitle">Deel het mooiste nieuws op jouw manier</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="geboorte-vooraf">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Vooraf aan de geboorte</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/geboortekaartjes/enveloppen" class="mm-subcat-link">Enveloppen bestellen</a>
+                        <a href="/geboortekaartjes/aankondiging-zwangerschap" class="mm-subcat-link">Zwangerschapsaankondiging</a>
+                        <a href="/uitnodiging-maken/gender-reveal" class="mm-subcat-link">Gender reveal</a>
+                        <a href="/uitnodiging-maken/babyshower/babyshower-uitnodiging" class="mm-subcat-link">Babyshower</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="geboorte-producten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Geboorteproducten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/geboorteproducten" class="mm-subcat-link">Alle geboorteproducten</a>
+                        <a href="/geboortekaartjes/geboortebord" class="mm-subcat-link">Geboorteborden</a>
+                        <a href="/geboortekaartjes/kraambezoekboek" class="mm-subcat-link">Kraambezoekboeken</a>
+                        <a href="/doopsuiker" class="mm-subcat-link">Doopsuikers</a>
+                        <a href="/cadeaus/kraamcadeau" class="mm-subcat-link">Kraamcadeaus</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="geboorte-extras">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Voor bij de kaart</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/geboortekaartjes/enveloppen" class="mm-subcat-link">Envelop (vooraf) bestellen</a>
+                        <a href="/geboortekaartjes/sluitzegels-bewerkbaar" class="mm-subcat-link">Sluitsticker</a>
+                        <a href="/geboortekaartjes/adresstickers" class="mm-subcat-link">Adresstickers</a>
+                        <a href="/geboortekaartjes/enveloppen-extra" class="mm-subcat-link">Bekijk alle producten</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="geboorte-kraamcadeaus">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Kraamcadeaus</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/cadeaus/kraamcadeau" class="mm-subcat-link">Alle kraamcadeaus</a>
+                        <a href="/cadeaus/kraamcadeau-jongen" class="mm-subcat-link">Kraamcadeaus jongen</a>
+                        <a href="/cadeaus/kraamcadeau-meisje" class="mm-subcat-link">Kraamcadeaus meisje</a>
+                        <a href="/cadeaus/kraamcadeau?filters=babymutsje,badcape,badjas" class="mm-subcat-link">Kleding & Verzorging</a>
+                        <a href="/cadeaus/kraamcadeau?filters=etui,hydrofiel,logeerkoffertje" class="mm-subcat-link">Onderweg</a>
+                        <a href="/cadeaus/kraamcadeau?filters=bewaarbundel,foto-en-wanddecoratie" class="mm-subcat-link">Baby & Kinderkamer</a>
+                        <a href="/cadeaus/kraamcadeau?filters=chocolade-wikkel,doucheschuim" class="mm-subcat-link">Voor mama</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Verjaardag -->
+            <li class="nav-item" data-menu="verjaardag">
+              <button class="nav-link">
+                Verjaardag
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="verjaardag-uitnodigingen">
+                      <span>Verjaardagsuitnodigingen</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="verjaardag-kaarten">
+                      <span>Verjaardagskaarten</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="verjaardag-cadeaus">
+                      <span>Verjaardagscadeaus</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/verjaardag" class="mm-category-link">Alles voor verjaardag →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="verjaardag-uitnodigingen">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Verjaardagsuitnodigingen</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag" class="mm-subcat-link">Alle uitnodigingen verjaardag</a>
+                        <a href="/uitnodiging-maken/uitnodiging-50-jaar" class="mm-subcat-link">50 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zestig" class="mm-subcat-link">60 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zeventig" class="mm-subcat-link">70 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=tachtig" class="mm-subcat-link">80 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodiging-kinderfeestje" class="mm-subcat-link">Kinderfeestje uitnodiging</a>
+                        <a href="/uitnodiging-maken/zelf-uitnodigingen-maken" class="mm-subcat-link">Zelf uitnodiging maken</a>
+                      </div>
+                    </div>
+                    <a href="/uitnodiging-maken/uitnodigingen-verjaardag" class="mm-featured">
+                      <img src="./img/megamenu-uitnodigingen.webp" alt="Uitnodigingen collectie">
+                      <span class="mm-featured-title">Verjaardagsuitnodigingen</span>
+                      <span class="mm-featured-subtitle">Nodig je gasten uit in stijl</span>
+                    </a>
+                  </div>
+                  <div class="mm-subcategories" id="verjaardag-kaarten">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Verjaardagskaarten</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/wenskaarten/verjaardagskaart" class="mm-subcat-link">Alle verjaardagskaarten</a>
+                        <a href="/uitnodiging-maken/verjaardagsuitnodiging-man" class="mm-subcat-link">Man</a>
+                        <a href="/uitnodiging-maken/verjaardagsuitnodiging-vrouw" class="mm-subcat-link">Vrouw</a>
+                        <a href="/uitnodiging-maken/uitnodiging-kinderfeestje" class="mm-subcat-link">Kind</a>
+                        <a href="#" class="mm-subcat-link">Met foto</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="verjaardag-cadeaus">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Verjaardagscadeaus</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="#" class="mm-subcat-link">Man</a>
+                        <a href="#" class="mm-subcat-link">Vrouw</a>
+                        <a href="#" class="mm-subcat-link">Kind</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Uitnodigingen -->
+            <li class="nav-item" data-menu="uitnodigingen">
+              <button class="nav-link">
+                Uitnodigingen
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="uitnodigingen-verjaardag">
+                      <span>Verjaardag</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="uitnodigingen-kinderfeestje">
+                      <span>Kinderfeestje</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="uitnodigingen-communie">
+                      <span>Communie, vormsel & doop</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="uitnodigingen-jubileum">
+                      <span>Jubileum</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="uitnodigingen-babyshower">
+                      <span>Babyshower & Gender reveal</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/uitnodiging-maken" class="mm-category-link">Alle uitnodigingen →</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="uitnodigingen-verjaardag">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Verjaardag</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag" class="mm-subcat-link">Alle uitnodigingen verjaardag</a>
+                        <a href="/uitnodiging-maken/uitnodiging-50-jaar" class="mm-subcat-link">50 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zestig" class="mm-subcat-link">60 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zeventig" class="mm-subcat-link">70 jaar</a>
+                        <a href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=tachtig" class="mm-subcat-link">80 jaar</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="uitnodigingen-kinderfeestje">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Kinderfeestje</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken/uitnodiging-kinderfeestje" class="mm-subcat-link">Alle kinderfeestje uitnodigingen</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="uitnodigingen-communie">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Communie, vormsel & doop</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken/doop" class="mm-subcat-link">Uitnodigingen doop</a>
+                        <a href="/uitnodiging-maken/communiekaartjes" class="mm-subcat-link">Uitnodigingen communie</a>
+                        <a href="/uitnodiging-maken/vormsel" class="mm-subcat-link">Uitnodigingen vormsel</a>
+                        <a href="/uitnodiging-maken/lentefeest" class="mm-subcat-link">Uitnodigingen lentefeest</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="uitnodigingen-jubileum">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Jubileum</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/jubileumkaarten" class="mm-subcat-link">Alle jubileumkaarten</a>
+                        <a href="/jubileumkaarten?filters=tien" class="mm-subcat-link">10 jaar</a>
+                        <a href="/jubileumkaarten/12-5-jaar-getrouwd" class="mm-subcat-link">12,5 jaar</a>
+                        <a href="/jubileumkaarten/25-jaar-getrouwd" class="mm-subcat-link">25 jaar</a>
+                        <a href="/jubileumkaarten?filters=veertig" class="mm-subcat-link">40 jaar</a>
+                        <a href="/jubileumkaarten/50-jaar-getrouwd" class="mm-subcat-link">50 jaar</a>
+                        <a href="/jubileumkaarten/60-jaar-getrouwd" class="mm-subcat-link">60 jaar</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="uitnodigingen-babyshower">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Babyshower & Gender reveal</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/uitnodiging-maken/babyshower/babyshower-uitnodiging" class="mm-subcat-link">Babyshower uitnodiging</a>
+                        <a href="/uitnodiging-maken/gender-reveal" class="mm-subcat-link">Gender reveal</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Meer -->
+            <li class="nav-item" data-menu="meer">
+              <button class="nav-link">
+                Meer
+                <i class="fa-solid fa-chevron-down"></i>
+              </button>
+              <div class="mega-menu">
+                <div class="mega-menu-inner">
+                  <div class="mm-categories">
+                    <button class="mm-category" data-subcategory="meer-zelfmaken">
+                      <span>Zelf maken</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="meer-back2school">
+                      <span>Back2school</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="meer-felicitatie">
+                      <span>Felicitatie</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button class="mm-category" data-subcategory="meer-denkenaan">
+                      <span>Denken aan</span>
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <a href="/klantenservice" class="mm-category-link">Klantenservice</a>
+                    <a href="/over-ons" class="mm-category-link">Over ons</a>
+                    <a href="/blog" class="mm-category-link">Blog</a>
+                  </div>
+                  <div class="mm-subcategories is-active" id="meer-zelfmaken">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Zelf maken</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="#" class="mm-subcat-link">Trouwkaarten</a>
+                        <a href="#" class="mm-subcat-link">Geboortekaartjes</a>
+                        <a href="#" class="mm-subcat-link">Uitnodigingen</a>
+                        <a href="#" class="mm-subcat-link">Jubileumkaarten</a>
+                        <a href="#" class="mm-subcat-link">Kerstkaarten</a>
+                        <a href="#" class="mm-subcat-link">Fotoproducten zelf maken</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="meer-back2school">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Back2school</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/rugzakken" class="mm-subcat-link">Rugzakken</a>
+                        <a href="#" class="mm-subcat-link">Broodtrommels</a>
+                        <a href="#" class="mm-subcat-link">Schoolbekers</a>
+                        <a href="#" class="mm-subcat-link">Waterflessen</a>
+                        <a href="#" class="mm-subcat-link">Etuis</a>
+                        <a href="#" class="mm-subcat-link">Naamstickers</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="meer-felicitatie">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Felicitatie</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/wenskaarten/felicitatie-geboorte" class="mm-subcat-link">Geboorte</a>
+                        <a href="/wenskaarten/felicitatie-zwangerschap" class="mm-subcat-link">Zwangerschap</a>
+                        <a href="#" class="mm-subcat-link">Trouwen</a>
+                        <a href="/uitnodiging-maken/verhuiskaarten" class="mm-subcat-link">Nieuwe woning</a>
+                        <a href="#" class="mm-subcat-link">Werk</a>
+                        <a href="#" class="mm-subcat-link">Geslaagd</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mm-subcategories" id="meer-denkenaan">
+                    <div class="mm-subcategories-content">
+                      <h3 class="mm-subcategories-title">Denken aan</h3>
+                      <div class="mm-subcategories-grid">
+                        <a href="/wenskaarten/condoleancekaart" class="mm-subcat-link">Condoleance</a>
+                        <a href="/wenskaarten/sterkte-kaart" class="mm-subcat-link">Sterkte</a>
+                        <a href="/wenskaarten/ikdenkaanje" class="mm-subcat-link">Zomaar</a>
+                        <a href="/wenskaarten/beterschap-kaart" class="mm-subcat-link">Beterschap</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <h1>Mega Menu Demo</h1>
+      <p>Dit is een demo van een horizontale navbar met mega menu's. Hover over de menu-items om de mega menu's te zien. Links zie je de categorieën, en als je daar overheen hovert verschijnen rechts de subcategorieën.</p>
+    </main>
+
+    <script>
+      document.querySelectorAll('.mm-category').forEach(category => {
+        category.addEventListener('mouseenter', function() {
+          const megaMenu = this.closest('.mega-menu');
+          const subcategoryId = this.dataset.subcategory;
+          
+          megaMenu.querySelectorAll('.mm-category').forEach(cat => {
+            cat.classList.remove('is-active');
+          });
+          this.classList.add('is-active');
+          
+          megaMenu.querySelectorAll('.mm-subcategories').forEach(sub => {
+            sub.classList.remove('is-active');
+          });
+          
+          const targetSubcategory = document.getElementById(subcategoryId);
+          if (targetSubcategory) {
+            targetSubcategory.classList.add('is-active');
+          }
+        });
+      });
+
+      document.querySelectorAll('.nav-item').forEach(navItem => {
+        navItem.addEventListener('mouseenter', function() {
+          const megaMenu = this.querySelector('.mega-menu');
+          if (megaMenu) {
+            const firstCategory = megaMenu.querySelector('.mm-category');
+            const firstSubcategory = megaMenu.querySelector('.mm-subcategories');
+            
+            if (firstCategory && firstSubcategory) {
+              megaMenu.querySelectorAll('.mm-category').forEach(cat => {
+                cat.classList.remove('is-active');
+              });
+              megaMenu.querySelectorAll('.mm-subcategories').forEach(sub => {
+                sub.classList.remove('is-active');
+              });
+              
+              firstCategory.classList.add('is-active');
+              firstSubcategory.classList.add('is-active');
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
