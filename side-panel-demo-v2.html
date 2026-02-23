@@ -45,7 +45,7 @@
       .navbar {
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 0;
         background: var(--sp-bg);
         border-bottom: 1px solid var(--sp-border);
       }
@@ -144,9 +144,9 @@
 
       .sp-offcanvas {
         position: fixed;
-        top: 65.5px;
+        top: 0;
         left: 0;
-        height: calc(100% - 65.5px);
+        height: 100%;
         width: min(92vw, 340px);
         background: var(--sp-bg);
         box-shadow: var(--sp-shadow);
@@ -336,6 +336,10 @@
         border-bottom: 1px solid var(--sp-border);
         min-height: 56px;
         gap: 12px;
+      }
+
+      .sp-drilldown .sp-drilldown-header ~ .sp-menu-list ~ .sp-drilldown-header {
+        padding-top: 32px;
       }
 
       .sp-drilldown-header-left {
@@ -705,6 +709,12 @@
                     <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
                   </button>
                 </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-drilldown="zelf-maken">
+                    <span>Zelf maken</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -760,18 +770,31 @@
                   </button>
                 </div>
                 <div class="sp-menu-item">
-                  <button type="button" class="sp-menu-button" data-drilldown="beterschap">
-                    <span>Beterschap</span>
+                  <button type="button" class="sp-menu-button" data-drilldown="denken-aan">
+                    <span>Denken aan</span>
                     <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
                   </button>
                 </div>
+              </div>
+            </div>
+
+            <div class="sp-menu-section">
+              <h2 class="sp-menu-section-title">Hulp & informatie</h2>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item sp-menu-item-account" id="menu-item-account"><a class="sp-menu-link" href="/account"><span>Account</span></a></div>
+                <div class="sp-menu-item sp-menu-item-login" id="menu-item-login"><a class="sp-menu-link" href="/login"><span>Inloggen of registreren</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/klantenservice"><span>Klantenservice</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/over-ons"><span>Over ons</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/blog"><span>Blog</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/duurzaamheid"><span>Duurzaamheid</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/reviews"><span>Reviews</span></a></div>
               </div>
             </div>
           </div>
 
           <!-- Kolom 2: Drilldown met subcategorieën -->
           <div class="sp-detail-column">
-            <!-- Kaarten (met subdrilldown voor Felicitatie) -->
+            <!-- Kaarten (met subdrilldown voor Felicitatie en Denken aan) -->
             <div class="sp-drilldown" id="drilldown-cards" aria-hidden="true">
               <div class="sp-drilldown-header">
                 <div class="sp-drilldown-header-left">
@@ -787,18 +810,27 @@
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag"><span>Verjaardagsuitnodigingen</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/jubileumkaarten"><span>Jubileumkaarten</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kinderfeestje</span></a></div>
+              </div>
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <h3 class="sp-drilldown-title">Wenskaarten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Alle wenskaarten</span></a></div>
                 <div class="sp-menu-item">
                   <button type="button" class="sp-menu-button" data-subdrilldown="cards-felicitatie">
                     <span>Felicitatie</span>
                     <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
                   </button>
                 </div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/condoleancekaart"><span>Condoleance</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/sterkte-kaart"><span>Sterkte</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/ikdenkaanje"><span>Zomaar</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Beterschap</span></a></div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="cards-denken-aan">
+                    <span>Denken aan</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Wenskaarten zelf maken</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten"><span>Alle categorieën</span></a></div>
               </div>
             </div>
 
@@ -812,6 +844,7 @@
                 
               </div>
               <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus"><span>Alle cadeaus</span></a></div>
                 <div class="sp-menu-item">
                   <button type="button" class="sp-menu-button" data-subdrilldown="gifts-kraamcadeaus">
                     <span>Kraamcadeaus</span>
@@ -823,7 +856,6 @@
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/fotocadeau"><span>Fotocadeau</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/zakelijk"><span>Relatiegeschenken</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/trouwkaarten/getuigen-vragen"><span>Getuigen vragen</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus"><span>Alle cadeaus</span></a></div>
               </div>
             </div>
 
@@ -1158,6 +1190,61 @@
                 </div>
               </div>
             </div>
+
+            <!-- Denken aan -->
+            <div class="sp-drilldown" id="drilldown-denken-aan" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Denken aan</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/condoleancekaart"><span>Condoleance</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/sterkte-kaart"><span>Sterkte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/ikdenkaanje"><span>Zomaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Beterschap</span></a></div>
+              </div>
+            </div>
+
+            <!-- Zelf maken -->
+            <div class="sp-drilldown" id="drilldown-zelf-maken" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Zelf maken</h3>
+                </div>
+                
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="zelfmaken-kaarten">
+                    <span>Kaarten</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="zelfmaken-trouwen">
+                    <span>Trouwen</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="zelfmaken-geboorte">
+                    <span>Geboorte</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item">
+                  <button type="button" class="sp-menu-button" data-subdrilldown="zelfmaken-cadeaus">
+                    <span>Cadeaus</span>
+                    <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+                  </button>
+                </div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Fotoproducten zelf maken</span></a></div>
+              </div>
+            </div>
           </div>
 
           <!-- Kolom 3: Subdrilldown met items -->
@@ -1290,7 +1377,7 @@
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/geboortekaartjes-meisje"><span>Geboortekaartje meisje</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/neutrale-geboortekaartjes"><span>Neutrale geboortekaartjes</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/zelf-geboortekaartjes-maken"><span>Zelf geboortekaartje maken</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes"><span>Bekijk alle geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes"><span>Alle geboortekaartjes</span></a></div>
               </div>
             </div>
 
@@ -1317,11 +1404,11 @@
                 </div>
               </div>
               <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboorteproducten"><span>Alle geboorteproducten</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/geboortebord"><span>Geboorteborden</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/kraambezoekboek"><span>Kraambezoekboeken</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/doopsuiker"><span>Doopsuikers</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Kraamcadeaus</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboorteproducten"><span>Alle geboorteproducten</span></a></div>
               </div>
             </div>
 
@@ -1349,12 +1436,12 @@
               </div>
               <div class="sp-menu-list">
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle kraamcadeaus</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/geboorteposter"><span>Geboorteposter</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/memory-box"><span>Memorybox geboorte</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/geboortekaartjes/bewaarbundel-geboortekaartjes"><span>Bewaarbundel geboortekaartjes</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wanddecoratie/geboortetegel"><span>Geboortetegeltje</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/luiertas-met-naam"><span>Luiertas met naam</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle producten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-jongen"><span>Kraamcadeaus Jongen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-meisje"><span>Kraamcadeaus meisje</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=babymutsje,badcape,badjas,doucheschuim,happy-horse,happy-horse-knuffeldoekje,hydrofiel,rompertje,slabbetje"><span>Kleding & Verzorging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=etui,hydrofiel,logeerkoffertje,mombag,rugtas,teddy-rugzakje"><span>Onderweg</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=bewaarbundel,foto-en-wanddecoratie,groeimeter,houten-koffertje,houten-spaarpot,lakentje,memorybox,meubelstickers,mombag,speelgoedmand"><span>Baby & Kinderkamer</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=chocolade-wikkel,doucheschuim,fles-etiket,mombag"><span>Voor mama</span></a></div>
               </div>
             </div>
 
@@ -1367,13 +1454,13 @@
                 </div>
               </div>
               <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag"><span>Alle uitnodigingen verjaardag</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-50-jaar"><span>50 jaar</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zestig"><span>60 jaar</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=zeventig"><span>70 jaar</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag?filters=tachtig"><span>80 jaar</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kinderfeestje uitnodiging</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/zelf-uitnodigingen-maken"><span>Zelf uitnodiging maken</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodigingen-verjaardag"><span>Alle uitnodigingen verjaardag</span></a></div>
               </div>
             </div>
 
@@ -1385,11 +1472,11 @@
                 </div>
               </div>
               <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/verjaardagskaart"><span>Alle verjaardagskaarten</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/verjaardagsuitnodiging-man"><span>Man</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/verjaardagsuitnodiging-vrouw"><span>Vrouw</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/uitnodiging-maken/uitnodiging-kinderfeestje"><span>Kind</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Met foto</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/verjaardagskaart"><span>Alle verjaardagskaarten</span></a></div>
               </div>
             </div>
 
@@ -1447,13 +1534,13 @@
                 </div>
               </div>
               <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle kraamcadeaus</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-jongen"><span>Kraamcadeaus Jongen</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau-meisje"><span>Kraamcadeaus meisje</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=babymutsje,badcape,badjas,doucheschuim,happy-horse,happy-horse-knuffeldoekje,hydrofiel,rompertje,slabbetje"><span>Kleding & Verzorging</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=etui,hydrofiel,logeerkoffertje,mombag,rugtas,teddy-rugzakje"><span>Onderweg</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=bewaarbundel,foto-en-wanddecoratie,groeimeter,houten-koffertje,houten-spaarpot,lakentje,memorybox,meubelstickers,mombag,speelgoedmand"><span>Baby & Kinderkamer</span></a></div>
                 <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau?filters=chocolade-wikkel,doucheschuim,fles-etiket,mombag"><span>Voor mama</span></a></div>
-                <div class="sp-menu-item"><a class="sp-menu-link" href="/cadeaus/kraamcadeau"><span>Alle kraamcadeaus</span></a></div>
               </div>
             </div>
 
@@ -1735,6 +1822,22 @@
               </div>
             </div>
 
+            <!-- Kaarten - Denken aan subcategorie -->
+            <div class="sp-subdrilldown" id="subdrilldown-cards-denken-aan" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Denken aan</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/condoleancekaart"><span>Condoleance</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/sterkte-kaart"><span>Sterkte</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/ikdenkaanje"><span>Zomaar</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="/wenskaarten/beterschap-kaart"><span>Beterschap</span></a></div>
+              </div>
+            </div>
+
             <!-- Beterschap subcategorieën -->
             <div class="sp-subdrilldown" id="subdrilldown-beterschap-gelegenheid" aria-hidden="true">
               <div class="sp-drilldown-header">
@@ -1770,6 +1873,84 @@
                 <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Jongen</span></a></div>
               </div>
             </div>
+
+            <!-- Zelf maken subcategorieën -->
+            <div class="sp-subdrilldown" id="subdrilldown-zelfmaken-kaarten" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Kaarten</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Uitnodigingen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Jubileumkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Kerstkaarten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-zelfmaken-trouwen" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Trouwen</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Trouwkaarten</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Adresstickers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Enveloppendoos</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Fles etiket</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Naamkaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Liturgie</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Sluitsticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Tafelnummer</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Trouwbedankjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Welkomstbord</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Alle producten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-zelfmaken-geboorte" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Geboorte</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Geboortekaartjes</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Adresstickers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Tuinborden</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Raamborden</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Sluitzegels</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Doopsuikers</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Foto en wanddecoratie</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Kraambezoekboek</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Raamsticker</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Vlag</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Zwangerschapsaankondiging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Alle producten</span></a></div>
+              </div>
+            </div>
+
+            <div class="sp-subdrilldown" id="subdrilldown-zelfmaken-cadeaus" aria-hidden="true">
+              <div class="sp-drilldown-header">
+                <div class="sp-drilldown-header-left">
+                  <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+                  <h3 class="sp-drilldown-title">Cadeaus</h3>
+                </div>
+              </div>
+              <div class="sp-menu-list">
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Zwangerschapsaankondiging</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Getuigen vragen</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Kraamcadeau</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Huwelijkscadeau</span></a></div>
+                <div class="sp-menu-item"><a class="sp-menu-link" href="#"><span>Doopcadeau</span></a></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1780,6 +1961,26 @@
       const closeMenu = document.getElementById("closeMenu");
       const overlay = document.getElementById("overlay");
       const offcanvas = document.getElementById("offcanvas");
+
+      // Handle Account/Login visibility based on isLoggedIn
+      (function() {
+        const accountItem = document.getElementById("menu-item-account");
+        const loginItem = document.getElementById("menu-item-login");
+        
+        if (typeof isLoggedIn === "undefined") {
+          // Script not found, show both
+          if (accountItem) accountItem.style.display = "";
+          if (loginItem) loginItem.style.display = "";
+        } else if (isLoggedIn === true) {
+          // User is logged in, show Account, hide Login
+          if (accountItem) accountItem.style.display = "";
+          if (loginItem) loginItem.style.display = "none";
+        } else {
+          // User is not logged in, hide Account, show Login
+          if (accountItem) accountItem.style.display = "none";
+          if (loginItem) loginItem.style.display = "";
+        }
+      })();
 
       // Collect all drilldowns and subdrilldowns
       const drilldowns = {};
