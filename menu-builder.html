@@ -1,0 +1,1955 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu Builder - Side Panel Editor</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* === BASE STYLES === */
+    :root {
+      --primary: #D07444;
+      --primary-hover: #ac5a2e;
+      --bg: #f5f5f7;
+      --surface: #ffffff;
+      --text: #1b1b1f;
+      --muted: #6b6b74;
+      --border: #e1e1e3;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* === LAYOUT === */
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-title {
+      font-weight: 600;
+      font-size: 16px;
+      margin-right: 16px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 4px;
+      padding-right: 12px;
+      border-right: 1px solid var(--border);
+      margin-right: 4px;
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 320px 350px 1fr;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .panel:last-child {
+      border-right: none;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    /* === BUTTONS === */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg);
+      border-color: var(--muted);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .btn-icon {
+      padding: 6px 8px;
+    }
+
+    /* === TREE VIEW === */
+    .tree {
+      list-style: none;
+    }
+
+    .tree-item {
+      margin-bottom: 2px;
+    }
+
+    .tree-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      border: 1px solid transparent;
+    }
+
+    .tree-item-header:hover {
+      background: var(--bg);
+    }
+
+    .tree-item-header.selected {
+      background: #fef3ed;
+      border-color: var(--primary);
+    }
+
+    .tree-item-header.dragging {
+      opacity: 0.5;
+    }
+
+    .tree-item-header.drag-over {
+      border-color: var(--primary);
+      border-style: dashed;
+    }
+
+    .tree-toggle {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      transition: transform 0.15s ease;
+    }
+
+    .tree-toggle.expanded {
+      transform: rotate(90deg);
+    }
+
+    .tree-toggle.hidden {
+      visibility: hidden;
+    }
+
+    .tree-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .tree-label {
+      flex: 1;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tree-type {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .tree-actions {
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .tree-item-header:hover .tree-actions {
+      opacity: 1;
+    }
+
+    .tree-action-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .tree-action-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .tree-action-btn.delete:hover {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .tree-children {
+      list-style: none;
+      margin-left: 28px;
+      border-left: 1px solid var(--border);
+      padding-left: 12px;
+    }
+
+    .tree-section {
+      margin-bottom: 16px;
+    }
+
+    .tree-section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .tree-section-header:hover {
+      background: #e8e8ea;
+    }
+
+    .tree-section-header.selected {
+      background: #fef3ed;
+      outline: 2px solid var(--primary);
+    }
+
+    .tree-section-title {
+      flex: 1;
+      font-weight: 600;
+    }
+
+    /* === FORM === */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-help {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .form-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .form-checkbox input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* === PREVIEW === */
+    .preview-container {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .preview-menu {
+      background: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .preview-section {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-section:last-child {
+      border-bottom: none;
+    }
+
+    .preview-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .preview-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 2px;
+    }
+
+    .preview-item:hover {
+      background: var(--bg);
+    }
+
+    .preview-item-label {
+      font-weight: 500;
+    }
+
+    .preview-item-arrow {
+      color: var(--muted);
+    }
+
+    /* === OUTPUT === */
+    .output-container {
+      background: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: #2d2d2d;
+    }
+
+    .output-title {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .output-code {
+      width: 100%;
+      min-height: 300px;
+      padding: 16px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border: none;
+      font-family: "Fira Code", "Consolas", monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .output-code:focus {
+      outline: none;
+    }
+
+    /* === EMPTY STATE === */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      margin-bottom: 16px;
+    }
+
+    /* === MODAL === */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .modal-close:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .modal-body {
+      padding: 20px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* === TOAST === */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast-error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .toast-icon {
+      font-size: 18px;
+    }
+
+    .toast-success .toast-icon {
+      color: var(--success);
+    }
+
+    .toast-error .toast-icon {
+      color: var(--danger);
+    }
+
+    /* === TABS === */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      padding: 0 16px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s ease;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* === HIDDEN FILE INPUT === */
+    .hidden-input {
+      display: none;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 280px 300px 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        display: none;
+      }
+
+      .panel.active {
+        display: flex;
+      }
+
+      .mobile-nav {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <span class="toolbar-title"><i class="fa-solid fa-bars"></i> Menu Builder</span>
+      
+      <div class="toolbar-group">
+        <button class="btn" id="btnNew" title="Nieuw menu">
+          <i class="fa-solid fa-file"></i> Nieuw
+        </button>
+        <button class="btn" id="btnLoadSample" title="Laad voorbeeldmenu">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Voorbeeld
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="btn" id="btnSave" title="Opslaan in browser">
+          <i class="fa-solid fa-floppy-disk"></i> Opslaan
+        </button>
+        <button class="btn" id="btnLoad" title="Laden uit browser">
+          <i class="fa-solid fa-folder-open"></i> Laden
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="btn" id="btnExport" title="Exporteer als JSON">
+          <i class="fa-solid fa-download"></i> Export JSON
+        </button>
+        <button class="btn" id="btnImport" title="Importeer JSON">
+          <i class="fa-solid fa-upload"></i> Import JSON
+        </button>
+        <input type="file" id="fileInput" class="hidden-input" accept=".json">
+      </div>
+
+      <div class="toolbar-group">
+        <button class="btn btn-primary" id="btnGenerate" title="Genereer HTML code">
+          <i class="fa-solid fa-code"></i> Genereer HTML
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Panel 1: Tree View -->
+      <div class="panel" id="panelTree">
+        <div class="panel-header">
+          <span>Menu Structuur</span>
+          <button class="btn btn-sm btn-primary" id="btnAddSection">
+            <i class="fa-solid fa-plus"></i> Sectie
+          </button>
+        </div>
+        <div class="panel-content" id="treeContainer">
+          <div class="empty-state" id="emptyTree">
+            <i class="fa-solid fa-sitemap empty-state-icon"></i>
+            <p class="empty-state-text">Nog geen menu items.<br>Voeg een sectie toe om te beginnen.</p>
+            <button class="btn btn-primary" id="btnAddSectionEmpty">
+              <i class="fa-solid fa-plus"></i> Sectie toevoegen
+            </button>
+          </div>
+          <div id="treeRoot"></div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Item Editor -->
+      <div class="panel" id="panelEditor">
+        <div class="panel-header">
+          <span>Item Bewerken</span>
+        </div>
+        <div class="panel-content" id="editorContainer">
+          <div class="empty-state" id="emptyEditor">
+            <i class="fa-solid fa-mouse-pointer empty-state-icon"></i>
+            <p class="empty-state-text">Selecteer een item in de<br>menu structuur om te bewerken.</p>
+          </div>
+          <form id="itemForm" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="itemType">
+                <option value="section">Sectie</option>
+                <option value="link">Link</option>
+                <option value="drilldown">Drilldown (submenu)</option>
+                <option value="subdrilldown">Subdrilldown (3e niveau)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Label / Titel</label>
+              <input type="text" class="form-input" id="itemLabel" placeholder="Menu item naam">
+            </div>
+
+            <div class="form-group" id="groupHref">
+              <label class="form-label">URL</label>
+              <input type="text" class="form-input" id="itemHref" placeholder="/pagina-url">
+              <p class="form-help">Laat leeg voor # link</p>
+            </div>
+
+            <div class="form-group" id="groupId">
+              <label class="form-label">ID</label>
+              <input type="text" class="form-input" id="itemId" placeholder="unieke-id">
+              <p class="form-help">Wordt automatisch gegenereerd als leeg</p>
+            </div>
+
+            <div class="form-group" id="groupBadge">
+              <label class="form-label">Badge tekst (optioneel)</label>
+              <input type="text" class="form-input" id="itemBadge" placeholder="nieuw!">
+              <p class="form-help">Wordt als label voor de tekst getoond</p>
+            </div>
+
+            <div class="form-group" id="groupImage">
+              <label class="form-label">Featured Image URL</label>
+              <input type="text" class="form-input" id="itemImage" placeholder="./img/featured.webp">
+              <p class="form-help">Afbeelding onderaan het drilldown panel</p>
+            </div>
+
+            <div class="form-group" id="groupDrilldownTitle">
+              <label class="form-label">Drilldown Titel</label>
+              <input type="text" class="form-input" id="itemDrilldownTitle" placeholder="Submenu titel">
+              <p class="form-help">Titel bovenaan het submenu panel</p>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 24px;">
+              <button type="submit" class="btn btn-primary" style="flex: 1;">
+                <i class="fa-solid fa-check"></i> Opslaan
+              </button>
+              <button type="button" class="btn btn-danger" id="btnDeleteItem">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Panel 3: Preview & Output -->
+      <div class="panel" id="panelOutput">
+        <div class="tabs">
+          <button class="tab active" data-tab="preview">Preview</button>
+          <button class="tab" data-tab="output">HTML Output</button>
+        </div>
+        <div class="panel-content">
+          <!-- Preview Tab -->
+          <div class="tab-content active" id="tabPreview">
+            <div class="preview-container">
+              <div class="preview-menu" id="previewMenu">
+                <div class="empty-state">
+                  <i class="fa-solid fa-eye empty-state-icon"></i>
+                  <p class="empty-state-text">Preview verschijnt hier<br>wanneer je items toevoegt.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Output Tab -->
+          <div class="tab-content" id="tabOutput">
+            <div class="output-container">
+              <div class="output-header">
+                <span class="output-title">HTML Code</span>
+                <button class="btn btn-sm" id="btnCopy">
+                  <i class="fa-solid fa-copy"></i> Kopiëren
+                </button>
+              </div>
+              <textarea class="output-code" id="outputCode" readonly placeholder="Klik op 'Genereer HTML' om de code te genereren..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Modal: Add Item -->
+  <div class="modal-overlay" id="modalAddItem">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Item Toevoegen</span>
+        <button class="modal-close" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="newItemType">
+            <option value="link">Link</option>
+            <option value="drilldown">Drilldown (submenu)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Label</label>
+          <input type="text" class="form-input" id="newItemLabel" placeholder="Menu item naam">
+        </div>
+        <div class="form-group" id="newGroupHref">
+          <label class="form-label">URL</label>
+          <input type="text" class="form-input" id="newItemHref" placeholder="/pagina-url">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close-modal>Annuleren</button>
+        <button class="btn btn-primary" id="btnConfirmAddItem">Toevoegen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add Section -->
+  <div class="modal-overlay" id="modalAddSection">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Sectie Toevoegen</span>
+        <button class="modal-close" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Sectie Titel</label>
+          <input type="text" class="form-input" id="newSectionTitle" placeholder="Categorieën">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close-modal>Annuleren</button>
+        <button class="btn btn-primary" id="btnConfirmAddSection">Toevoegen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // MENU BUILDER APPLICATION
+    // ============================================
+
+    const App = {
+      // Current menu data
+      data: {
+        sections: []
+      },
+
+      // Sample data based on side-panel-demo-v2.html
+      sampleData: {
+        sections: [
+          {
+            id: "categorieen",
+            title: "Categorieën",
+            items: [
+              {
+                id: "cards",
+                type: "drilldown",
+                label: "Kaarten",
+                drilldown: {
+                  title: "Kaarten",
+                  featuredImage: null,
+                  items: [
+                    { id: "trouwkaarten", type: "link", label: "Trouwkaarten", href: "/trouwkaarten" },
+                    { id: "geboortekaartjes", type: "link", label: "Geboortekaartjes", href: "/geboortekaartjes" },
+                    { id: "uitnodigingen", type: "link", label: "Uitnodigingen", href: "/uitnodiging-maken" },
+                    { id: "verjaardagskaarten", type: "link", label: "Verjaardagskaarten", href: "/verjaardagskaarten" },
+                    {
+                      id: "cards-felicitatie",
+                      type: "subdrilldown",
+                      label: "Felicitatie",
+                      subdrilldown: {
+                        title: "Felicitatie",
+                        items: [
+                          { id: "felicitatie-geboorte", type: "link", label: "Felicitatie geboorte", href: "/wenskaarten/felicitatie-geboorte" },
+                          { id: "felicitatie-huwelijk", type: "link", label: "Felicitatie huwelijk", href: "/wenskaarten/felicitatie-huwelijk" },
+                          { id: "felicitatie-verjaardag", type: "link", label: "Felicitatie verjaardag", href: "/wenskaarten/felicitatie-verjaardag" }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                id: "gifts",
+                type: "drilldown",
+                label: "Cadeaus",
+                drilldown: {
+                  title: "Cadeaus",
+                  featuredImage: "./img/megamenu-cadeaus.webp",
+                  items: [
+                    { id: "fotoboek", type: "link", label: "Fotoboek", href: "/fotoboek" },
+                    { id: "fotokalender", type: "link", label: "Fotokalender", href: "/fotokalender" },
+                    { id: "puzzel", type: "link", label: "Fotopuzzel", href: "/fotopuzzel" }
+                  ]
+                }
+              },
+              {
+                id: "zelf-maken",
+                type: "drilldown",
+                label: "Zelf maken",
+                drilldown: {
+                  title: "Zelf maken",
+                  featuredImage: null,
+                  items: [
+                    { id: "zelfmaken-kaarten", type: "link", label: "Kaarten", href: "#" },
+                    { id: "zelfmaken-trouwen", type: "link", label: "Trouwen", href: "#" },
+                    { id: "zelfmaken-geboorte", type: "link", label: "Geboorte", href: "#" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            id: "momenten",
+            title: "Momenten",
+            items: [
+              {
+                id: "birth",
+                type: "drilldown",
+                label: "Geboorte",
+                drilldown: {
+                  title: "Geboorte",
+                  featuredImage: "./img/megamenu-geboorte.webp",
+                  items: [
+                    {
+                      id: "birth-kaartje",
+                      type: "subdrilldown",
+                      label: "Geboortekaartje",
+                      subdrilldown: {
+                        title: "Geboortekaartje",
+                        items: [
+                          { id: "kaartje-jongen", type: "link", label: "Geboortekaartje jongen", href: "/geboortekaartjes/geboortekaartjes-jongen" },
+                          { id: "kaartje-meisje", type: "link", label: "Geboortekaartje meisje", href: "/geboortekaartjes/geboortekaartjes-meisje" },
+                          { id: "kaartje-neutraal", type: "link", label: "Neutrale geboortekaartjes", href: "/geboortekaartjes/neutrale-geboortekaartjes" }
+                        ]
+                      }
+                    },
+                    { id: "birth-bedankjes", type: "link", label: "Bedankjes", href: "/geboortekaartjes/bedankjes" },
+                    { id: "birth-decoratie", type: "link", label: "Geboortedecoratie", href: "/geboortekaartjes/decoratie" }
+                  ]
+                }
+              },
+              {
+                id: "wedding",
+                type: "drilldown",
+                label: "Trouwen",
+                drilldown: {
+                  title: "Trouwen",
+                  featuredImage: "./img/megamenu-trouwen.webp",
+                  items: [
+                    {
+                      id: "wedding-trouwuitnodigingen",
+                      type: "subdrilldown",
+                      label: "Trouwuitnodigingen",
+                      subdrilldown: {
+                        title: "Trouwuitnodigingen",
+                        items: [
+                          { id: "trouw-alle", type: "link", label: "Alle trouwkaarten", href: "/trouwkaarten" },
+                          { id: "trouw-nieuw", type: "link", label: "Nieuwste trouwkaarten", href: "/trouwkaarten/nieuwe-trouwkaarten" },
+                          { id: "trouw-collectie", type: "link", label: "Trouwcollectie 2026", href: "/trouwkaarten/trends", badge: "nieuw!" }
+                        ]
+                      }
+                    },
+                    {
+                      id: "wedding-trouwkaarten",
+                      type: "subdrilldown",
+                      label: "Bruiloftkaarten",
+                      subdrilldown: {
+                        title: "Bruiloftkaarten",
+                        items: [
+                          { id: "bruiloft-alle", type: "link", label: "Alle trouwkaarten", href: "/trouwkaarten" },
+                          { id: "bruiloft-save", type: "link", label: "Save the date kaarten", href: "/trouwkaarten/save-the-date-kaarten" },
+                          { id: "bruiloft-bedank", type: "link", label: "Bedankkaarten", href: "/trouwkaarten/bedankkaartjes-bruiloft" }
+                        ]
+                      }
+                    },
+                    {
+                      id: "wedding-decoratie",
+                      type: "subdrilldown",
+                      label: "Bruiloftdecoratie",
+                      subdrilldown: {
+                        title: "Bruiloftdecoratie",
+                        items: [
+                          { id: "deco-alle", type: "link", label: "Alle bruiloftsdecoratie", href: "/trouwkaarten/bruiloft-decoratie" },
+                          { id: "deco-welkom", type: "link", label: "Welkomstbord", href: "/bruiloftsbord" },
+                          { id: "deco-gastenboek", type: "link", label: "Gastenboek", href: "/gastenboek" }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                id: "birthday",
+                type: "drilldown",
+                label: "Verjaardag",
+                drilldown: {
+                  title: "Verjaardag",
+                  featuredImage: null,
+                  items: [
+                    { id: "verjaardag-uitnodiging", type: "link", label: "Verjaardagsuitnodiging", href: "/uitnodiging-maken/verjaardag" },
+                    { id: "verjaardag-kaart", type: "link", label: "Verjaardagskaart", href: "/verjaardagskaarten" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            id: "hulp-informatie",
+            title: "Hulp & informatie",
+            items: [
+              { id: "account", type: "link", label: "Account", href: "/account" },
+              { id: "klantenservice", type: "link", label: "Klantenservice", href: "/klantenservice" },
+              { id: "over-ons", type: "link", label: "Over ons", href: "/over-ons" },
+              { id: "blog", type: "link", label: "Blog", href: "/blog" },
+              { id: "duurzaamheid", type: "link", label: "Duurzaamheid", href: "/duurzaamheid" },
+              { id: "reviews", type: "link", label: "Reviews", href: "/reviews" }
+            ]
+          }
+        ]
+      },
+
+      // Currently selected item
+      selectedItem: null,
+      selectedPath: null,
+
+      // Initialize the application
+      init() {
+        this.bindEvents();
+        this.loadFromLocalStorage();
+        this.render();
+      },
+
+      // ============================================
+      // EVENT BINDINGS
+      // ============================================
+      bindEvents() {
+        // Toolbar buttons
+        document.getElementById('btnNew').addEventListener('click', () => this.newMenu());
+        document.getElementById('btnLoadSample').addEventListener('click', () => this.loadSampleData());
+        document.getElementById('btnSave').addEventListener('click', () => this.saveToLocalStorage());
+        document.getElementById('btnLoad').addEventListener('click', () => this.loadFromLocalStorage(true));
+        document.getElementById('btnExport').addEventListener('click', () => this.exportJSON());
+        document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileInput').click());
+        document.getElementById('fileInput').addEventListener('change', (e) => this.importJSON(e));
+        document.getElementById('btnGenerate').addEventListener('click', () => this.generateHTML());
+
+        // Add section buttons
+        document.getElementById('btnAddSection').addEventListener('click', () => this.showModal('modalAddSection'));
+        document.getElementById('btnAddSectionEmpty').addEventListener('click', () => this.showModal('modalAddSection'));
+        document.getElementById('btnConfirmAddSection').addEventListener('click', () => this.addSection());
+
+        // Add item modal
+        document.getElementById('btnConfirmAddItem').addEventListener('click', () => this.confirmAddItem());
+        document.getElementById('newItemType').addEventListener('change', (e) => {
+          document.getElementById('newGroupHref').style.display = e.target.value === 'link' ? 'block' : 'none';
+        });
+
+        // Item form
+        document.getElementById('itemForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.saveItem();
+        });
+        document.getElementById('itemType').addEventListener('change', () => this.updateFormVisibility());
+        document.getElementById('btnDeleteItem').addEventListener('click', () => this.deleteSelectedItem());
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+          tab.addEventListener('click', () => this.switchTab(tab.dataset.tab));
+        });
+
+        // Copy button
+        document.getElementById('btnCopy').addEventListener('click', () => this.copyToClipboard());
+
+        // Modal close buttons
+        document.querySelectorAll('[data-close-modal]').forEach(btn => {
+          btn.addEventListener('click', () => this.closeAllModals());
+        });
+
+        // Close modals on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) this.closeAllModals();
+          });
+        });
+      },
+
+      // ============================================
+      // MODAL HELPERS
+      // ============================================
+      showModal(id) {
+        document.getElementById(id).classList.add('active');
+      },
+
+      closeAllModals() {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+      },
+
+      // ============================================
+      // TAB SWITCHING
+      // ============================================
+      switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
+      },
+
+      // ============================================
+      // TOAST NOTIFICATIONS
+      // ============================================
+      showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+          <i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} toast-icon"></i>
+          <span>${message}</span>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      },
+
+      // ============================================
+      // DATA MANAGEMENT
+      // ============================================
+      newMenu() {
+        if (confirm('Weet je zeker dat je een nieuw menu wilt beginnen? Alle huidige wijzigingen gaan verloren.')) {
+          this.data = { sections: [] };
+          this.selectedItem = null;
+          this.selectedPath = null;
+          this.render();
+          this.showToast('Nieuw menu gestart');
+        }
+      },
+
+      loadSampleData() {
+        if (this.data.sections.length > 0) {
+          if (!confirm('Dit vervangt je huidige menu met voorbeelddata. Doorgaan?')) return;
+        }
+        this.data = JSON.parse(JSON.stringify(this.sampleData));
+        this.selectedItem = null;
+        this.selectedPath = null;
+        this.render();
+        this.showToast('Voorbeeldmenu geladen');
+      },
+
+      saveToLocalStorage() {
+        localStorage.setItem('menuBuilderData', JSON.stringify(this.data));
+        this.showToast('Menu opgeslagen in browser');
+      },
+
+      loadFromLocalStorage(showMessage = false) {
+        const saved = localStorage.getItem('menuBuilderData');
+        if (saved) {
+          try {
+            this.data = JSON.parse(saved);
+            this.selectedItem = null;
+            this.selectedPath = null;
+            this.render();
+            if (showMessage) this.showToast('Menu geladen uit browser');
+          } catch (e) {
+            if (showMessage) this.showToast('Fout bij laden', 'error');
+          }
+        } else if (showMessage) {
+          this.showToast('Geen opgeslagen menu gevonden', 'error');
+        }
+      },
+
+      exportJSON() {
+        const json = JSON.stringify(this.data, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'menu-config.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('JSON geëxporteerd');
+      },
+
+      importJSON(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            this.data = JSON.parse(event.target.result);
+            this.selectedItem = null;
+            this.selectedPath = null;
+            this.render();
+            this.showToast('JSON geïmporteerd');
+          } catch (err) {
+            this.showToast('Ongeldig JSON bestand', 'error');
+          }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+      },
+
+      // ============================================
+      // SECTION MANAGEMENT
+      // ============================================
+      addSection() {
+        const title = document.getElementById('newSectionTitle').value.trim();
+        if (!title) {
+          this.showToast('Voer een titel in', 'error');
+          return;
+        }
+
+        const id = this.generateId(title);
+        this.data.sections.push({
+          id,
+          title,
+          items: []
+        });
+
+        document.getElementById('newSectionTitle').value = '';
+        this.closeAllModals();
+        this.render();
+        this.showToast('Sectie toegevoegd');
+      },
+
+      // ============================================
+      // ITEM MANAGEMENT
+      // ============================================
+      addItemTo: null,
+
+      showAddItemModal(path) {
+        this.addItemTo = path;
+        document.getElementById('newItemLabel').value = '';
+        document.getElementById('newItemHref').value = '';
+        
+        const typeSelect = document.getElementById('newItemType');
+        typeSelect.innerHTML = '';
+        
+        if (path.level === 'section') {
+          typeSelect.innerHTML = `
+            <option value="link">Link</option>
+            <option value="drilldown">Drilldown (submenu)</option>
+          `;
+        } else if (path.level === 'drilldown') {
+          typeSelect.innerHTML = `
+            <option value="link">Link</option>
+            <option value="subdrilldown">Subdrilldown (3e niveau)</option>
+          `;
+        } else {
+          typeSelect.innerHTML = `<option value="link">Link</option>`;
+        }
+
+        document.getElementById('newGroupHref').style.display = 'block';
+        this.showModal('modalAddItem');
+      },
+
+      confirmAddItem() {
+        const label = document.getElementById('newItemLabel').value.trim();
+        if (!label) {
+          this.showToast('Voer een label in', 'error');
+          return;
+        }
+
+        const type = document.getElementById('newItemType').value;
+        const href = document.getElementById('newItemHref').value.trim();
+        const id = this.generateId(label);
+
+        const newItem = {
+          id,
+          type,
+          label,
+          href: type === 'link' ? (href || '#') : null
+        };
+
+        if (type === 'drilldown') {
+          newItem.drilldown = {
+            title: label,
+            featuredImage: null,
+            items: []
+          };
+        } else if (type === 'subdrilldown') {
+          newItem.subdrilldown = {
+            title: label,
+            items: []
+          };
+        }
+
+        // Add to correct location
+        const path = this.addItemTo;
+        if (path.level === 'section') {
+          this.data.sections[path.sectionIndex].items.push(newItem);
+        } else if (path.level === 'drilldown') {
+          this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items.push(newItem);
+        } else if (path.level === 'subdrilldown') {
+          this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex].subdrilldown.items.push(newItem);
+        }
+
+        this.closeAllModals();
+        this.render();
+        this.showToast('Item toegevoegd');
+      },
+
+      selectItem(item, path) {
+        this.selectedItem = item;
+        this.selectedPath = path;
+        this.renderEditor();
+        this.renderTree();
+      },
+
+      saveItem() {
+        if (!this.selectedItem || !this.selectedPath) return;
+
+        const type = document.getElementById('itemType').value;
+        const label = document.getElementById('itemLabel').value.trim();
+        const href = document.getElementById('itemHref').value.trim();
+        const id = document.getElementById('itemId').value.trim() || this.generateId(label);
+        const badge = document.getElementById('itemBadge').value.trim();
+        const image = document.getElementById('itemImage').value.trim();
+        const drilldownTitle = document.getElementById('itemDrilldownTitle').value.trim();
+
+        if (!label) {
+          this.showToast('Label is verplicht', 'error');
+          return;
+        }
+
+        // Update the item based on path
+        const path = this.selectedPath;
+        let item;
+
+        if (path.level === 'section') {
+          item = this.data.sections[path.sectionIndex];
+          item.title = label;
+          item.id = id;
+        } else if (path.level === 'item') {
+          item = this.data.sections[path.sectionIndex].items[path.itemIndex];
+          item.label = label;
+          item.id = id;
+          item.type = type;
+          item.badge = badge || null;
+          
+          if (type === 'link') {
+            item.href = href || '#';
+            delete item.drilldown;
+            delete item.subdrilldown;
+          } else if (type === 'drilldown') {
+            item.href = null;
+            if (!item.drilldown) {
+              item.drilldown = { title: label, featuredImage: null, items: [] };
+            }
+            item.drilldown.title = drilldownTitle || label;
+            item.drilldown.featuredImage = image || null;
+            delete item.subdrilldown;
+          }
+        } else if (path.level === 'drilldownItem') {
+          item = this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex];
+          item.label = label;
+          item.id = id;
+          item.type = type;
+          item.badge = badge || null;
+
+          if (type === 'link') {
+            item.href = href || '#';
+            delete item.subdrilldown;
+          } else if (type === 'subdrilldown') {
+            item.href = null;
+            if (!item.subdrilldown) {
+              item.subdrilldown = { title: label, items: [] };
+            }
+            item.subdrilldown.title = drilldownTitle || label;
+          }
+        } else if (path.level === 'subdrilldownItem') {
+          item = this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex].subdrilldown.items[path.subSubIndex];
+          item.label = label;
+          item.id = id;
+          item.href = href || '#';
+          item.badge = badge || null;
+        }
+
+        this.selectedItem = item;
+        this.render();
+        this.showToast('Item opgeslagen');
+      },
+
+      deleteSelectedItem() {
+        if (!this.selectedPath) return;
+        if (!confirm('Weet je zeker dat je dit item wilt verwijderen?')) return;
+
+        const path = this.selectedPath;
+
+        if (path.level === 'section') {
+          this.data.sections.splice(path.sectionIndex, 1);
+        } else if (path.level === 'item') {
+          this.data.sections[path.sectionIndex].items.splice(path.itemIndex, 1);
+        } else if (path.level === 'drilldownItem') {
+          this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items.splice(path.subIndex, 1);
+        } else if (path.level === 'subdrilldownItem') {
+          this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex].subdrilldown.items.splice(path.subSubIndex, 1);
+        }
+
+        this.selectedItem = null;
+        this.selectedPath = null;
+        this.render();
+        this.showToast('Item verwijderd');
+      },
+
+      // ============================================
+      // RENDERING
+      // ============================================
+      render() {
+        this.renderTree();
+        this.renderEditor();
+        this.renderPreview();
+      },
+
+      renderTree() {
+        const container = document.getElementById('treeRoot');
+        const emptyState = document.getElementById('emptyTree');
+
+        if (this.data.sections.length === 0) {
+          emptyState.style.display = 'flex';
+          container.innerHTML = '';
+          return;
+        }
+
+        emptyState.style.display = 'none';
+        container.innerHTML = this.data.sections.map((section, sIndex) => this.renderSection(section, sIndex)).join('');
+
+        // Bind tree events
+        this.bindTreeEvents();
+      },
+
+      renderSection(section, sIndex) {
+        const isSelected = this.selectedPath?.level === 'section' && this.selectedPath?.sectionIndex === sIndex;
+        
+        return `
+          <div class="tree-section" data-section="${sIndex}">
+            <div class="tree-section-header ${isSelected ? 'selected' : ''}" data-select-section="${sIndex}">
+              <i class="fa-solid fa-folder tree-icon"></i>
+              <span class="tree-section-title">${this.escapeHtml(section.title)}</span>
+              <div class="tree-actions">
+                <button class="tree-action-btn" data-add-to-section="${sIndex}" title="Item toevoegen">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+                <button class="tree-action-btn delete" data-delete-section="${sIndex}" title="Verwijderen">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <ul class="tree tree-children">
+              ${section.items.map((item, iIndex) => this.renderTreeItem(item, sIndex, iIndex)).join('')}
+            </ul>
+          </div>
+        `;
+      },
+
+      renderTreeItem(item, sIndex, iIndex, subIndex = null, subSubIndex = null) {
+        let level, pathData, hasChildren = false, children = [];
+
+        if (subSubIndex !== null) {
+          level = 'subdrilldownItem';
+          pathData = `data-path='${JSON.stringify({level, sectionIndex: sIndex, itemIndex: iIndex, subIndex, subSubIndex})}'`;
+        } else if (subIndex !== null) {
+          level = 'drilldownItem';
+          pathData = `data-path='${JSON.stringify({level, sectionIndex: sIndex, itemIndex: iIndex, subIndex})}'`;
+          if (item.type === 'subdrilldown' && item.subdrilldown?.items?.length) {
+            hasChildren = true;
+            children = item.subdrilldown.items;
+          }
+        } else {
+          level = 'item';
+          pathData = `data-path='${JSON.stringify({level, sectionIndex: sIndex, itemIndex: iIndex})}'`;
+          if (item.type === 'drilldown' && item.drilldown?.items?.length) {
+            hasChildren = true;
+            children = item.drilldown.items;
+          }
+        }
+
+        const isSelected = this.selectedPath && 
+          this.selectedPath.level === level &&
+          this.selectedPath.sectionIndex === sIndex &&
+          this.selectedPath.itemIndex === iIndex &&
+          this.selectedPath.subIndex === subIndex &&
+          this.selectedPath.subSubIndex === subSubIndex;
+
+        const icon = item.type === 'link' ? 'fa-link' : 
+                     item.type === 'drilldown' ? 'fa-folder-tree' : 
+                     item.type === 'subdrilldown' ? 'fa-folder-open' : 'fa-link';
+
+        const typeLabel = item.type === 'link' ? 'link' : 
+                          item.type === 'drilldown' ? 'drilldown' : 
+                          item.type === 'subdrilldown' ? 'subdrilldown' : 'link';
+
+        let addButton = '';
+        if (item.type === 'drilldown') {
+          addButton = `<button class="tree-action-btn" data-add-to-drilldown='${JSON.stringify({sectionIndex: sIndex, itemIndex: iIndex})}' title="Item toevoegen"><i class="fa-solid fa-plus"></i></button>`;
+        } else if (item.type === 'subdrilldown') {
+          addButton = `<button class="tree-action-btn" data-add-to-subdrilldown='${JSON.stringify({sectionIndex: sIndex, itemIndex: iIndex, subIndex})}' title="Item toevoegen"><i class="fa-solid fa-plus"></i></button>`;
+        }
+
+        return `
+          <li class="tree-item">
+            <div class="tree-item-header ${isSelected ? 'selected' : ''}" ${pathData}>
+              <span class="tree-toggle ${hasChildren ? 'expanded' : 'hidden'}">
+                <i class="fa-solid fa-chevron-right"></i>
+              </span>
+              <i class="fa-solid ${icon} tree-icon"></i>
+              <span class="tree-label">${this.escapeHtml(item.label)}</span>
+              <span class="tree-type">${typeLabel}</span>
+              <div class="tree-actions">
+                ${addButton}
+                <button class="tree-action-btn delete" data-delete-item='${JSON.stringify({level, sectionIndex: sIndex, itemIndex: iIndex, subIndex, subSubIndex})}' title="Verwijderen">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            ${hasChildren ? `
+              <ul class="tree tree-children">
+                ${children.map((child, cIndex) => {
+                  if (level === 'item') {
+                    return this.renderTreeItem(child, sIndex, iIndex, cIndex);
+                  } else {
+                    return this.renderTreeItem(child, sIndex, iIndex, subIndex, cIndex);
+                  }
+                }).join('')}
+              </ul>
+            ` : ''}
+          </li>
+        `;
+      },
+
+      bindTreeEvents() {
+        // Select section
+        document.querySelectorAll('[data-select-section]').forEach(el => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.tree-actions')) return;
+            const sIndex = parseInt(el.dataset.selectSection);
+            this.selectItem(this.data.sections[sIndex], { level: 'section', sectionIndex: sIndex });
+          });
+        });
+
+        // Select item
+        document.querySelectorAll('[data-path]').forEach(el => {
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.tree-actions')) return;
+            const path = JSON.parse(el.dataset.path);
+            let item;
+            if (path.level === 'item') {
+              item = this.data.sections[path.sectionIndex].items[path.itemIndex];
+            } else if (path.level === 'drilldownItem') {
+              item = this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex];
+            } else if (path.level === 'subdrilldownItem') {
+              item = this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex].subdrilldown.items[path.subSubIndex];
+            }
+            this.selectItem(item, path);
+          });
+        });
+
+        // Add to section
+        document.querySelectorAll('[data-add-to-section]').forEach(el => {
+          el.addEventListener('click', () => {
+            const sIndex = parseInt(el.dataset.addToSection);
+            this.showAddItemModal({ level: 'section', sectionIndex: sIndex });
+          });
+        });
+
+        // Add to drilldown
+        document.querySelectorAll('[data-add-to-drilldown]').forEach(el => {
+          el.addEventListener('click', () => {
+            const data = JSON.parse(el.dataset.addToDrilldown);
+            this.showAddItemModal({ level: 'drilldown', ...data });
+          });
+        });
+
+        // Add to subdrilldown
+        document.querySelectorAll('[data-add-to-subdrilldown]').forEach(el => {
+          el.addEventListener('click', () => {
+            const data = JSON.parse(el.dataset.addToSubdrilldown);
+            this.showAddItemModal({ level: 'subdrilldown', ...data });
+          });
+        });
+
+        // Delete section
+        document.querySelectorAll('[data-delete-section]').forEach(el => {
+          el.addEventListener('click', () => {
+            if (!confirm('Weet je zeker dat je deze sectie wilt verwijderen?')) return;
+            const sIndex = parseInt(el.dataset.deleteSection);
+            this.data.sections.splice(sIndex, 1);
+            this.selectedItem = null;
+            this.selectedPath = null;
+            this.render();
+            this.showToast('Sectie verwijderd');
+          });
+        });
+
+        // Delete item
+        document.querySelectorAll('[data-delete-item]').forEach(el => {
+          el.addEventListener('click', () => {
+            if (!confirm('Weet je zeker dat je dit item wilt verwijderen?')) return;
+            const path = JSON.parse(el.dataset.deleteItem);
+            
+            if (path.level === 'item') {
+              this.data.sections[path.sectionIndex].items.splice(path.itemIndex, 1);
+            } else if (path.level === 'drilldownItem') {
+              this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items.splice(path.subIndex, 1);
+            } else if (path.level === 'subdrilldownItem') {
+              this.data.sections[path.sectionIndex].items[path.itemIndex].drilldown.items[path.subIndex].subdrilldown.items.splice(path.subSubIndex, 1);
+            }
+
+            this.selectedItem = null;
+            this.selectedPath = null;
+            this.render();
+            this.showToast('Item verwijderd');
+          });
+        });
+      },
+
+      renderEditor() {
+        const form = document.getElementById('itemForm');
+        const emptyState = document.getElementById('emptyEditor');
+
+        if (!this.selectedItem || !this.selectedPath) {
+          form.style.display = 'none';
+          emptyState.style.display = 'flex';
+          return;
+        }
+
+        form.style.display = 'block';
+        emptyState.style.display = 'none';
+
+        const item = this.selectedItem;
+        const path = this.selectedPath;
+
+        // Set type options based on level
+        const typeSelect = document.getElementById('itemType');
+        if (path.level === 'section') {
+          typeSelect.innerHTML = '<option value="section">Sectie</option>';
+          typeSelect.value = 'section';
+        } else if (path.level === 'item') {
+          typeSelect.innerHTML = `
+            <option value="link">Link</option>
+            <option value="drilldown">Drilldown (submenu)</option>
+          `;
+          typeSelect.value = item.type || 'link';
+        } else if (path.level === 'drilldownItem') {
+          typeSelect.innerHTML = `
+            <option value="link">Link</option>
+            <option value="subdrilldown">Subdrilldown (3e niveau)</option>
+          `;
+          typeSelect.value = item.type || 'link';
+        } else {
+          typeSelect.innerHTML = '<option value="link">Link</option>';
+          typeSelect.value = 'link';
+        }
+
+        // Fill form fields
+        document.getElementById('itemLabel').value = path.level === 'section' ? item.title : item.label;
+        document.getElementById('itemId').value = item.id || '';
+        document.getElementById('itemHref').value = item.href || '';
+        document.getElementById('itemBadge').value = item.badge || '';
+        document.getElementById('itemImage').value = item.drilldown?.featuredImage || '';
+        document.getElementById('itemDrilldownTitle').value = item.drilldown?.title || item.subdrilldown?.title || '';
+
+        this.updateFormVisibility();
+      },
+
+      updateFormVisibility() {
+        const type = document.getElementById('itemType').value;
+        const path = this.selectedPath;
+
+        document.getElementById('groupHref').style.display = (type === 'link') ? 'block' : 'none';
+        document.getElementById('groupBadge').style.display = (path?.level !== 'section') ? 'block' : 'none';
+        document.getElementById('groupImage').style.display = (type === 'drilldown') ? 'block' : 'none';
+        document.getElementById('groupDrilldownTitle').style.display = (type === 'drilldown' || type === 'subdrilldown') ? 'block' : 'none';
+        document.getElementById('groupId').style.display = 'block';
+      },
+
+      renderPreview() {
+        const container = document.getElementById('previewMenu');
+
+        if (this.data.sections.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i class="fa-solid fa-eye empty-state-icon"></i>
+              <p class="empty-state-text">Preview verschijnt hier<br>wanneer je items toevoegt.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = this.data.sections.map(section => `
+          <div class="preview-section">
+            <div class="preview-section-title">${this.escapeHtml(section.title)}</div>
+            ${section.items.map(item => `
+              <div class="preview-item">
+                <span class="preview-item-label">
+                  ${item.badge ? `<span style="background:#fef3ed;color:var(--primary);padding:2px 6px;border-radius:4px;font-size:11px;margin-right:4px;">${this.escapeHtml(item.badge)}</span>` : ''}
+                  ${this.escapeHtml(item.label)}
+                </span>
+                ${item.type !== 'link' ? '<i class="fa-solid fa-chevron-right preview-item-arrow"></i>' : ''}
+              </div>
+            `).join('')}
+          </div>
+        `).join('');
+      },
+
+      // ============================================
+      // HTML GENERATION
+      // ============================================
+      generateHTML() {
+        const html = this.buildAsideHTML();
+        document.getElementById('outputCode').value = html;
+        this.switchTab('output');
+        this.showToast('HTML gegenereerd');
+      },
+
+      buildAsideHTML() {
+        let html = `<aside class="sp-offcanvas" id="offcanvas" aria-hidden="true">
+  <div class="sp-offcanvas-header">
+    <button class="sp-close-btn" id="closeMenu" aria-label="Sluit menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="sp-panel-body">
+    <div class="sp-menu-grid">
+      <!-- Kolom 1: Hoofdmenu -->
+      <div class="sp-menu-column">
+`;
+
+        // Render sections (column 1)
+        this.data.sections.forEach(section => {
+          html += `        <div class="sp-menu-section">
+          <h3 class="sp-menu-section-title">${this.escapeHtml(section.title)}</h3>
+          <div class="sp-menu-list">
+`;
+          section.items.forEach(item => {
+            if (item.type === 'link') {
+              html += `            <div class="sp-menu-item"><a class="sp-menu-link" href="${item.href || '#'}"><span>${this.renderLabelWithBadge(item)}</span></a></div>\n`;
+            } else if (item.type === 'drilldown') {
+              html += `            <div class="sp-menu-item">
+              <button type="button" class="sp-menu-button" data-drilldown="${item.id}">
+                <span>${this.escapeHtml(item.label)}</span>
+                <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+              </button>
+            </div>\n`;
+            }
+          });
+          html += `          </div>
+        </div>\n`;
+        });
+
+        html += `      </div>
+
+      <!-- Kolom 2: Drilldown met subcategorieën -->
+      <div class="sp-detail-column">
+`;
+
+        // Render drilldowns (column 2)
+        this.data.sections.forEach(section => {
+          section.items.forEach(item => {
+            if (item.type === 'drilldown' && item.drilldown) {
+              html += this.renderDrilldownHTML(item);
+            }
+          });
+        });
+
+        html += `      </div>
+
+      <!-- Kolom 3: Subdrilldown met items -->
+      <div class="sp-subdetail-column">
+`;
+
+        // Render subdrilldowns (column 3)
+        this.data.sections.forEach(section => {
+          section.items.forEach(item => {
+            if (item.type === 'drilldown' && item.drilldown) {
+              item.drilldown.items.forEach(subItem => {
+                if (subItem.type === 'subdrilldown' && subItem.subdrilldown) {
+                  html += this.renderSubdrilldownHTML(subItem);
+                }
+              });
+            }
+          });
+        });
+
+        html += `      </div>
+    </div>
+  </div>
+</aside>`;
+
+        return html;
+      },
+
+      renderDrilldownHTML(item) {
+        let html = `        <div class="sp-drilldown" id="drilldown-${item.id}" aria-hidden="true">
+          <div class="sp-drilldown-header">
+            <div class="sp-drilldown-header-left">
+              <button type="button" class="sp-drilldown-back" data-back="drilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+              <h3 class="sp-drilldown-title">${this.escapeHtml(item.drilldown.title || item.label)}</h3>
+            </div>
+          </div>
+          <div class="sp-menu-list">
+`;
+
+        item.drilldown.items.forEach(subItem => {
+          if (subItem.type === 'link') {
+            html += `            <div class="sp-menu-item"><a class="sp-menu-link" href="${subItem.href || '#'}"><span>${this.renderLabelWithBadge(subItem)}</span></a></div>\n`;
+          } else if (subItem.type === 'subdrilldown') {
+            html += `            <div class="sp-menu-item">
+              <button type="button" class="sp-menu-button" data-subdrilldown="${subItem.id}">
+                <span>${this.escapeHtml(subItem.label)}</span>
+                <span class="sp-menu-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+              </button>
+            </div>\n`;
+          }
+        });
+
+        html += `          </div>`;
+
+        if (item.drilldown.featuredImage) {
+          html += `\n\n          <a href="#" class="sp-menu-featured-image-link"><img src="${item.drilldown.featuredImage}" alt="Featured Image"></a>`;
+        }
+
+        html += `\n        </div>\n\n`;
+
+        return html;
+      },
+
+      renderSubdrilldownHTML(item) {
+        let html = `        <div class="sp-subdrilldown" id="subdrilldown-${item.id}" aria-hidden="true">
+          <div class="sp-drilldown-header">
+            <div class="sp-drilldown-header-left">
+              <button type="button" class="sp-drilldown-back" data-back="subdrilldown" aria-label="Terug"><i class="fa-solid fa-chevron-left"></i></button>
+              <h3 class="sp-drilldown-title">${this.escapeHtml(item.subdrilldown.title || item.label)}</h3>
+            </div>
+          </div>
+          <div class="sp-menu-list">
+`;
+
+        item.subdrilldown.items.forEach(subSubItem => {
+          html += `            <div class="sp-menu-item"><a class="sp-menu-link" href="${subSubItem.href || '#'}"><span>${this.renderLabelWithBadge(subSubItem)}</span></a></div>\n`;
+        });
+
+        html += `          </div>
+        </div>\n\n`;
+
+        return html;
+      },
+
+      renderLabelWithBadge(item) {
+        if (item.badge) {
+          return `<span class="sp-menu-badge">${this.escapeHtml(item.badge)}</span> ${this.escapeHtml(item.label)}`;
+        }
+        return this.escapeHtml(item.label);
+      },
+
+      copyToClipboard() {
+        const code = document.getElementById('outputCode');
+        code.select();
+        document.execCommand('copy');
+        this.showToast('Gekopieerd naar clipboard');
+      },
+
+      // ============================================
+      // UTILITIES
+      // ============================================
+      generateId(text) {
+        return text
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+      },
+
+      escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+    };
+
+    // Initialize app when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => App.init());
+  </script>
+</body>
+</html>
